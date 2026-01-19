@@ -7,4 +7,7 @@ When I ask questions:
 - Warn me about common mistakes
 - Keep explanations concise and practical
 
+What I have done:
+- Everything in @worklogs folder with each day's worklogs
+
 Don't write code for me unless I explicitly ask for examples.

@@ -3,6 +3,9 @@ Change K8S Context
 
 No idea when I finish it or Can I finish it. LOL
 
+# Feature/TODO
+- make it works with idea of Kubectx and Kubens
+
 # Installation
 - I think we need some struct and yaml parser. Recommendation was: `go get go.yaml.in/yaml/v3`
 ```bash
