@@ -16,3 +16,5 @@
 - Now we have to run: `go run .` instead of `go run main.go` because we have multiple files. The `.` mean compile whole fucking package in current folder.
 
 - Hmmm, structure need to be refactor as well. So Gemini recommend a file called `types.go` instead of `structures.go` xD
+
+- Ok, added args for handle action. For now we just: `go run .` and lets user select, not handle args yet. But i will handle it in next step.

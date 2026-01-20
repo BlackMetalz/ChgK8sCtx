@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/manifoldco/promptui" // Promptui for interactive prompt
@@ -10,11 +11,51 @@ import (
 
 func main() {
 
+	// Example:
+	// args[0] = binary name (ex: "./ChgK8sCtx")
+	// args[1] = first arg (ex: "ctx" or "ns")
+
 	// Call fucking function from config.go, same main package
 	config, err := loadConfig("./testdata/kubeconfig")
 	if err != nil {
 		fmt.Println("Error loading config:", err)
 		return
+	}
+
+	// Check args
+	var action string
+	if len(os.Args) < 2 {
+		// Ask user to select action
+		prompt := promptui.Select{
+			Label: "Select action",
+			Items: []string{"Change context", "Change namespace"},
+		}
+
+		_, result, err := prompt.Run()
+		if err != nil {
+			fmt.Println("Error running promptui:", err)
+			return
+		}
+
+		// fmt.Println("Your selection: ", result)
+
+		if result == "Change context" {
+			action = "ctx"
+		} else if result == "Change namespace" {
+			action = "ns"
+		}
+
+	} else {
+		action = os.Args[1] // Get first fucking arg.
+	}
+
+	switch action {
+	case "ctx":
+		fmt.Println("Change context")
+	case "ns":
+		fmt.Println("Change namespace")
+	default:
+		fmt.Println("Unknown action. Use 'Change context' or 'Change namespace'")
 	}
 
 	// List all context and append all cluster name to a slice of string
@@ -92,7 +133,4 @@ func main() {
 		fmt.Println("Error writing to file")
 		return
 	}
-
-	fmt.Println("Successfully switched to context: ", result)
-
 }
