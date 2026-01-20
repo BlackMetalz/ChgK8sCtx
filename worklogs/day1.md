@@ -46,15 +46,3 @@ Your selection:  staging-cluster
 
 - Show string "(current-context)" next to current context to let user know what is current context
 - Added backup after user selection, update current context. 
-
-# Day 2 - Jan20-2026
-
-### Midnight
-- I don't want to build 2 separated binary like kubectx and kubens. Just not clone xD. I want to build 1 binary that can do both for learning purpose.
-- So i have idea:
-    - if user run binary, it will lets user pick 2 options: Change context or Change namespace.
-    - if user pick Change context, it will show list of context and let user pick one.
-    - if user pick Change namespace, Ask user to enter new default namespace for current context (No validation for now!)
-    - Otherwise if user define args like:
-        - `go run main.go ns` ==> Ask user to enter new default namespace for current context (No validation for now!).
-        - `go run main.go ctx` ==> Give what user see in Day 1.

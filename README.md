@@ -13,3 +13,8 @@ kienlt@kienlt-pc:/data/ChgK8sCtx$ go get go.yaml.in/yaml/v3
 go: downloading go.yaml.in/yaml/v3 v3.0.4
 go: added go.yaml.in/yaml/v3 v3.0.4
 ```
+
+# Structure
+Flat structure:
+- My project is fucking small
+- No need to make it complex or fancy LOL
