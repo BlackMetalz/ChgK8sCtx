@@ -33,7 +33,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.22.x' # You can change the Go version here.
+        go-version: '1.24.2' # You can change the Go version here.
 
     # Step 3: Tidy downloads and cleans up project dependencies.
     - name: Install dependencies
