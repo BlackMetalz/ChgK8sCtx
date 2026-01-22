@@ -7,7 +7,7 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-func switchContext(config *KubeConfig) error {
+func switchContext(config *KubeConfig, kubeconfigPath string) error {
 	// Move code from main.go to here
 	// List all context and append all cluster name to a slice of string
 	// Init default slide of string
@@ -79,7 +79,7 @@ func switchContext(config *KubeConfig) error {
 	config.CurrentContext = result
 
 	// saveConfig
-	err = saveConfig("./testdata/kubeconfig", config) // config is pointer already.
+	err = saveConfig(kubeconfigPath, config) // config is pointer already.
 	if err != nil {
 		fmt.Println("Error writing to file")
 		return err
@@ -88,7 +88,7 @@ func switchContext(config *KubeConfig) error {
 	return nil
 }
 
-func switchNamespace(config *KubeConfig) error {
+func switchNamespace(config *KubeConfig, kubeconfigPath string) error {
 	// Ask user to enter namespace
 	prompt := promptui.Prompt{
 		Label: "Enter namespace",
@@ -100,8 +100,6 @@ func switchNamespace(config *KubeConfig) error {
 		return err
 	}
 
-	fmt.Println("Successfully switched to namespace: ", newNS)
-
 	for i, ctx := range config.Contexts {
 		if ctx.Name == config.CurrentContext { // Compare NAME
 			config.Contexts[i].Context.Namespace = newNS // Update STRUCT
@@ -110,7 +108,7 @@ func switchNamespace(config *KubeConfig) error {
 	}
 
 	// saveConfig
-	err = saveConfig("./testdata/kubeconfig", config) // config is pointer already.
+	err = saveConfig(kubeconfigPath, config) // config is pointer already.
 	if err != nil {
 		fmt.Println("Error writing to file")
 		return err

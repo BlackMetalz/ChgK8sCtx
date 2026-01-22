@@ -14,8 +14,15 @@ func main() {
 	// args[0] = binary name (ex: "./ChgK8sCtx")
 	// args[1] = first arg (ex: "ctx" or "ns")
 
+	// Get kubeconfig path
+	kubeconfigPath, err := getKubeconfigPath()
+	if err != nil {
+		fmt.Println("Error getting kubeconfig path:", err)
+		return
+	}
+
 	// Call fucking function from config.go, same main package
-	config, err := loadConfig("./testdata/kubeconfig")
+	config, err := loadConfig(kubeconfigPath)
 	if err != nil {
 		fmt.Println("Error loading config:", err)
 		return
@@ -27,7 +34,7 @@ func main() {
 		// Ask user to select action
 		prompt := promptui.Select{
 			Label: "Select action",
-			Items: []string{"Change context", "Change namespace"},
+			Items: []string{"Change current context", "Change default namespace"},
 		}
 
 		_, result, err := prompt.Run()
@@ -38,9 +45,9 @@ func main() {
 
 		// fmt.Println("Your selection: ", result)
 
-		if result == "Change context" {
+		if result == "Change current context" {
 			action = "ctx"
-		} else if result == "Change namespace" {
+		} else if result == "Change default namespace" {
 			action = "ns"
 		}
 
@@ -50,19 +57,23 @@ func main() {
 
 	switch action {
 	case "ctx":
-		fmt.Println("Change context")
-		err = switchContext(config)
+		// fmt.Println("Change context")
+		err = switchContext(config, kubeconfigPath)
 		if err != nil {
 			fmt.Println("Error running switchContext:", err)
 			return
+		} else {
+			fmt.Println("Successfully switched to context: ", config.CurrentContext)
 		}
 		return
 	case "ns":
-		fmt.Println("Change namespace")
-		err = switchNamespace(config)
+		// fmt.Println("Change default namespace")
+		err = switchNamespace(config, kubeconfigPath)
 		if err != nil {
 			fmt.Println("Error running switchNamespace:", err)
 			return
+		} else {
+			fmt.Println("Successfully switched to namespace: ", config.CurrentContext)
 		}
 		return
 	default:

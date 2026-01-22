@@ -3,10 +3,12 @@ package main // Still same package because same folder xD
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"go.yaml.in/yaml/v3"
 )
 
+// Parse kubeconfig file to struct
 func loadConfig(path string) (*KubeConfig, error) {
 	// Look at the func ReadFile. We don't need to talk about param
 	// Only understand this: ([]byte, error)
@@ -37,11 +39,22 @@ func loadConfig(path string) (*KubeConfig, error) {
 	// List context of K8S
 	fmt.Println("Current context:", config.CurrentContext)
 
+	// Print current namespace if not empty
+	for _, ctx := range config.Contexts {
+		if ctx.Name == config.CurrentContext {
+			if ctx.Context.Namespace != "" {
+				fmt.Println("Default namespace:", ctx.Context.Namespace)
+				break
+			}
+		}
+	}
+
 	// Func need return, so we return what it needs
 	return &config, nil
 
 }
 
+// Save kubeconfig file from struct to file
 func saveConfig(path string, config *KubeConfig) error {
 	// Oke, next step backup current file to .bak extension, overwrite if exist for simplicity
 	// This should be fine even we run multiple times.
@@ -54,14 +67,20 @@ func saveConfig(path string, config *KubeConfig) error {
 		return err // Because we return 2 values
 	}
 
-	// Backup file
+	// Backup file path.
 	bak_path := path + ".bak"
-	err = os.WriteFile(bak_path, _data, 0644)
-	if err != nil {
-		fmt.Println("Warning: Failed to create backup:", err)
-		return err // No fucking continue. No backup, no game.
-	} else {
-		fmt.Println("Current kubeconfig file was backed up to ", bak_path)
+
+	// Only backup if .bak doesn't exists, first time only
+	if _, err := os.Stat(bak_path); os.IsNotExist(err) {
+		// .bak doesn't exist → create backup
+		err = os.WriteFile(bak_path, _data, 0644)
+
+		// Check for fucking error bro!
+		if err != nil {
+			fmt.Println("Warning: Failed to create backup:", err)
+			return err // No fucking continue. No backup, no game.
+		}
+		// No need to print anything if backup is successful
 	}
 
 	// Write to file
@@ -76,7 +95,31 @@ func saveConfig(path string, config *KubeConfig) error {
 		return err
 	}
 
-	fmt.Println("Successfully switched to context: ", config.CurrentContext)
-
 	return nil
+}
+
+// Get default kubeconfig path
+func getKubeconfigPath() (string, error) {
+	// Check if KUBECONFIG environment variable is set
+	// This is a common Go idiom where the variable is declared and checked in the same line.
+	// I'm trying to become GO idiom LOL
+	if path := os.Getenv("KUBECONFIG"); path != "" {
+		fmt.Println("Using KUBECONFIG environment variable: ", path)
+		return path, nil
+	} else {
+		// Get home directory
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+
+		// Default kubeconfig path
+		// fmt.Println("Using default kubeconfig path: ", homeDir+"/.kube/config")
+		// return homeDir + "/.kube/config", nil
+
+		// Use filepath.Join to create a path that is safe for any operating system.
+		defaultPath := filepath.Join(homeDir, ".kube", "config")
+		fmt.Println("Using default kubeconfig path:", defaultPath)
+		return defaultPath, nil
+	}
 }
