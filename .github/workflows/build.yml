@@ -1,0 +1,61 @@
+# Name of the workflow, as it will appear in the GitHub Actions tab.
+# From gemini with LOVE. LOL
+name: Go Build
+
+# Defines the events that will trigger this workflow.
+on:
+  # Run on push events for the 'main' branch.
+  push:
+    branches: [ "main" ]
+  # Run on pull request events targeting the 'main' branch.
+  pull_request:
+    branches: [ "main" ]
+
+# Defines the jobs that will run as part of the workflow.
+jobs:
+  # The name of the job. You can name it anything.
+  build:
+    # Use a build matrix to run this job on multiple operating systems.
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    # The runner environment for the job, taken from the matrix above.
+    runs-on: ${{ matrix.os }}
+
+    # The sequence of tasks that will be executed as part of the job.
+    steps:
+    # Step 1: Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Step 2: Sets up a specific version of Go.
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22.x' # You can change the Go version here.
+
+    # Step 3: Tidy downloads and cleans up project dependencies.
+    - name: Install dependencies
+      run: go mod tidy
+
+    # Step 4 (Recommended): Run unit tests to ensure code quality.
+    # The -v flag provides verbose output. ./... runs tests in all subdirectories.
+    # No unit tests yet.
+    # - name: Run tests
+    #   run: go test -v ./...
+
+    # Step 5: Build the application.
+    # The -o flag sets the output file name, including the OS for easy distinction.
+    - name: Build application
+      run: go build -v -o chg-k8s-ctx-${{ matrix.os }} .
+
+    # Step 6 (Optional): Upload the built binary as a workflow artifact.
+    # You can download this file from the workflow run's summary page.
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        # The name of the artifact on GitHub.
+        name: chg-k8s-ctx-${{ matrix.os }}
+        # The path to the file(s) to upload.
+        path: chg-k8s-ctx-${{ matrix.os }}
