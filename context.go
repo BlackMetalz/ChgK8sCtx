@@ -34,19 +34,9 @@ func switchContext(config *KubeConfig, kubeconfigPath string) error {
 	// Run fucking prompt
 	_, result, err := prompt.Run()
 
-	// Go idiom style
-	switch err {
-	case nil:
-		// success, do nothing
-	case promptui.ErrInterrupt:
-		fmt.Println("Interrupted!")
-		return nil
-	case promptui.ErrEOF:
-		fmt.Println("Cancelled!")
-		return nil
-	default:
-		fmt.Printf("Error: %v\n", err)
-		return err
+	if err != nil {
+		// Use Helper func to handle Prompt Errors
+		return handlePromptError(err)
 	}
 
 	// Check if user select same context
@@ -89,23 +79,66 @@ func switchContext(config *KubeConfig, kubeconfigPath string) error {
 }
 
 func switchNamespace(config *KubeConfig, kubeconfigPath string) error {
-	// Ask user to enter namespace
-	prompt := promptui.Prompt{
-		Label: "Enter namespace",
-	}
 
-	newNS, err := prompt.Run()
+	// List all namespace for selection, not manually
+	nsList, err := listNamespaces()
 	if err != nil {
-		fmt.Println("Error running promptui:", err)
+		fmt.Println("Error getting namespace list:", err)
 		return err
 	}
 
-	for i, ctx := range config.Contexts {
-		if ctx.Name == config.CurrentContext { // Compare NAME
-			config.Contexts[i].Context.Namespace = newNS // Update STRUCT
-			break
+	var currentNS string
+	// Lets replace this with helper func
+	// for i, ctx := range config.Contexts {
+	// 	if ctx.Name == config.CurrentContext { // Compare NAME
+	// 		currentNS = config.Contexts[i].Context.Namespace
+	// 		// config.Contexts[i].Context.Namespace = newNS // Update STRUCT
+	// 		break
+	// 	}
+	// }
+
+	// Use helper func to get current context entry
+	entry := getCurrentContextEntry(config)
+	if entry == nil {
+		fmt.Println("Error getting current context entry")
+		return nil
+	}
+	currentNS = entry.Context.Namespace
+
+	// we had nsList from listNamespaces() func
+	var displayList []string // Make fucking slice for display and highlight current NS
+	for _, ns := range nsList {
+		// "" treat as default namespace, bro!
+		if ns == currentNS || (currentNS == "" && ns == "default") {
+			displayList = append(displayList, ns+"(current-namespace)")
+		} else {
+			displayList = append(displayList, ns)
 		}
 	}
+
+	// Ask user to enter namespace
+	prompt := promptui.Select{
+		Label: "Select namespace",
+		Items: displayList,
+	}
+
+	_, newNS, err := prompt.Run()
+	if err != nil {
+		// Use Helper func to handle Prompt Errors
+		return handlePromptError(err)
+	}
+
+	// Cleanup before save
+	newNS = strings.TrimSuffix(newNS, "(current-namespace)")
+
+	// Check if user select same namespace
+	if newNS == currentNS {
+		fmt.Println("You already selected this namespace!")
+		return nil
+	}
+
+	// Update struct
+	entry.Context.Namespace = newNS
 
 	// saveConfig
 	err = saveConfig(kubeconfigPath, config) // config is pointer already.

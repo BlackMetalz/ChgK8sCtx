@@ -14,6 +14,16 @@ func main() {
 	// args[0] = binary name (ex: "./ChgK8sCtx")
 	// args[1] = first arg (ex: "ctx" or "ns")
 
+	// Get namespace list
+	// nsList, err := listNamespaces()
+	// if err != nil {
+	// 	fmt.Println("Error getting namespace list:", err)
+	// 	return
+	// } else {
+	// 	fmt.Println("Namespace list:", nsList)
+	// }
+	// My job done here xD
+
 	// Get kubeconfig path
 	kubeconfigPath, err := getKubeconfigPath()
 	if err != nil {
@@ -73,7 +83,8 @@ func main() {
 			fmt.Println("Error running switchNamespace:", err)
 			return
 		} else {
-			fmt.Println("Successfully switched to namespace: ", config.CurrentContext)
+			entry := getCurrentContextEntry(config) // nil check here is not necessary
+			fmt.Println("Successfully switched to namespace: ", entry.Context.Namespace)
 		}
 		return
 	default:
