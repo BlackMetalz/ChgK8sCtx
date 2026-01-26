@@ -1,12 +1,8 @@
 package main
 
-import (
-	"fmt"
-	"os"
-
-	"github.com/manifoldco/promptui" // Promptui for interactive prompt
-	// Import this shit for unmarshal yaml
-)
+// Import this shit for unmarshal yaml
+// Import cmd package locally, not start with github.com
+// "chgk8sctx/cmd" // no need to import
 
 func main() {
 
@@ -24,71 +20,76 @@ func main() {
 	// }
 	// My job done here xD
 
-	// Get kubeconfig path
-	kubeconfigPath, err := getKubeconfigPath()
-	if err != nil {
-		fmt.Println("Error getting kubeconfig path:", err)
-		return
-	}
+	// Call cobra directly, because we don't need to import cmd package
+	Execute()
 
-	// Call fucking function from config.go, same main package
-	config, err := loadConfig(kubeconfigPath)
-	if err != nil {
-		fmt.Println("Error loading config:", err)
-		return
-	}
-
-	// Check args
-	var action string
-	if len(os.Args) < 2 {
-		// Ask user to select action
-		prompt := promptui.Select{
-			Label: "Select action",
-			Items: []string{"Change current context", "Change default namespace"},
-		}
-
-		_, result, err := prompt.Run()
+	// Comment from here to the end to use cobra cmd
+	/*
+		// Get kubeconfig path
+		kubeconfigPath, err := getKubeconfigPath()
 		if err != nil {
-			fmt.Println("Error running promptui:", err)
+			fmt.Println("Error getting kubeconfig path:", err)
 			return
 		}
 
-		// fmt.Println("Your selection: ", result)
-
-		if result == "Change current context" {
-			action = "ctx"
-		} else if result == "Change default namespace" {
-			action = "ns"
+		// Call fucking function from config.go, same main package
+		config, err := loadConfig(kubeconfigPath)
+		if err != nil {
+			fmt.Println("Error loading config:", err)
+			return
 		}
 
-	} else {
-		action = os.Args[1] // Get first fucking arg.
-	}
+		// Check args
+		var action string
+		if len(os.Args) < 2 {
+			// Ask user to select action
+			prompt := promptui.Select{
+				Label: "Select action",
+				Items: []string{"Change current context", "Change default namespace"},
+			}
 
-	switch action {
-	case "ctx":
-		// fmt.Println("Change context")
-		err = switchContext(config, kubeconfigPath)
-		if err != nil {
-			fmt.Println("Error running switchContext:", err)
-			return
+			_, result, err := prompt.Run()
+			if err != nil {
+				fmt.Println("Error running promptui:", err)
+				return
+			}
+
+			// fmt.Println("Your selection: ", result)
+
+			if result == "Change current context" {
+				action = "ctx"
+			} else if result == "Change default namespace" {
+				action = "ns"
+			}
+
 		} else {
-			fmt.Println("Successfully switched to context: ", config.CurrentContext)
+			action = os.Args[1] // Get first fucking arg.
 		}
-		return
-	case "ns":
-		// fmt.Println("Change default namespace")
-		err = switchNamespace(config, kubeconfigPath)
-		if err != nil {
-			fmt.Println("Error running switchNamespace:", err)
+
+		switch action {
+		case "ctx":
+			// fmt.Println("Change context")
+			err = switchContext(config, kubeconfigPath)
+			if err != nil {
+				fmt.Println("Error running switchContext:", err)
+				return
+			} else {
+				fmt.Println("Successfully switched to context: ", config.CurrentContext)
+			}
 			return
-		} else {
-			entry := getCurrentContextEntry(config) // nil check here is not necessary
-			fmt.Println("Successfully switched to namespace: ", entry.Context.Namespace)
+		case "ns":
+			// fmt.Println("Change default namespace")
+			err = switchNamespace(config, kubeconfigPath)
+			if err != nil {
+				fmt.Println("Error running switchNamespace:", err)
+				return
+			}
+
+			return
+		default:
+			fmt.Println("Unknown action. Use 'ctx' for change context or 'ns' for change namespace")
 		}
-		return
-	default:
-		fmt.Println("Unknown action. Use 'ctx' for change context or 'ns' for change namespace")
-	}
+
+	*/
 
 }
