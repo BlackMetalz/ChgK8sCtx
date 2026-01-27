@@ -13,6 +13,7 @@ var (
 	renameFlag  bool
 	listFlag    bool
 	currentFlag bool
+	deleteFlag  bool
 )
 
 var ctxCmd = &cobra.Command{
@@ -55,6 +56,12 @@ var ctxCmd = &cobra.Command{
 			// But it is not clear i guess.
 		}
 
+		// --delete/x flag
+		if deleteFlag {
+			deleteContext(config, path, args...) // Take variadic args
+			return
+		}
+
 		if len(args) == 0 {
 			// Interactive mode
 			switchContext(config, path)
@@ -77,6 +84,9 @@ func init() {
 
 	// Add current Flag
 	ctxCmd.Flags().BoolVarP(&currentFlag, "current", "c", false, "Show current context")
+
+	// Add delete Flag
+	ctxCmd.Flags().BoolVarP(&deleteFlag, "delete", "x", false, "Delete context")
 
 	// Add ctx command to root command
 	rootCmd.AddCommand(ctxCmd)

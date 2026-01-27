@@ -311,3 +311,78 @@ func showCurrentContext(config *KubeConfig) {
 		}
 	}
 }
+
+// func for delete context
+func deleteContext(config *KubeConfig, kubeconfigPath string, directArgs ...string) error {
+	// Support delete only one context at a time
+
+	// Check if only 1 context left --> not allow to delete
+	if len(config.Contexts) == 1 {
+		fmt.Println(red("Cannot delete the only 1 context left!"))
+		return nil
+	}
+
+	// Get context to delete (interactive or direct mode)
+	var targetContext string
+	if len(directArgs) == 1 {
+		targetContext = directArgs[0]
+
+		// Validate again, like rename context. Haizzz
+		// This could be refactored to a function later.
+		found := false // Fucking flag var.
+		for _, ctx := range config.Contexts {
+			if ctx.Name == targetContext {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			fmt.Printf("Context '%s' not found bro!\n", red(targetContext))
+			return nil
+		}
+	} else {
+		// Interactive selection goes here.
+		// Reuse code from switchContext/renameContext. Hmm another refactoring opportunity =.=!
+		// fmt.Println("Interactive selection goes here.")
+		var contextList []string
+		for _, ctx := range config.Contexts {
+			if ctx.Name == config.CurrentContext {
+				contextList = append(contextList, ctx.Name+"(current-context)")
+			} else {
+				contextList = append(contextList, ctx.Name)
+			}
+		}
+
+		prompt := promptui.Select{
+			Label: "Select context to delete please",
+			Items: contextList,
+		}
+
+		_, selectedContext, err := prompt.Run()
+		if err != nil {
+			return handlePromptError(err)
+		}
+
+		targetContext = strings.TrimSuffix(selectedContext, "(current-context)")
+	}
+
+	// Remove from context slices
+	// Modify in memory only, persist in saveConfig() func
+	config.Contexts = removeContextByName(config.Contexts, targetContext)
+
+	// If deleted current-context --> auto switch to another context
+	if targetContext == config.CurrentContext {
+		config.CurrentContext = config.Contexts[0].Name // Get the first of fucking context list
+		fmt.Printf("Auto switched to context: %s\n", green(config.CurrentContext))
+	}
+
+	// Save
+	err := saveConfig(kubeconfigPath, config)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Deleted context: %s\n", red(targetContext))
+	return nil
+}

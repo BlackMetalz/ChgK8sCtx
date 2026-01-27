@@ -37,16 +37,18 @@ func green(s string) string {
 	return "\x1b[32m" + s + "\x1b[0m"
 }
 
+// Red text helper xD
+func red(s string) string {
+	return "\x1b[31m" + s + "\x1b[0m"
+}
+
 /*
 // Yellow text helper xD
 func yellow(s string) string {
 	return "\x1b[33m" + s + "\x1b[0m"
 }
 
-// Red text helper xD
-func red(s string) string {
-	return "\x1b[31m" + s + "\x1b[0m"
-}
+
 
 // Blue text helper xD
 func blue(s string) string {
@@ -63,3 +65,16 @@ func cyan(s string) string {
 	return "\x1b[36m" + s + "\x1b[0m"
 }
 */
+
+// Remove context by name in slice of Context struct
+// Logic is very simple, everyone include me could understand
+// just put name of context you want to remove in function, it will return a Context slice without that context
+func removeContextByName(contexts []Context, name string) []Context {
+	var result []Context
+	for _, ctx := range contexts {
+		if ctx.Name != name {
+			result = append(result, ctx)
+		}
+	}
+	return result
+}
