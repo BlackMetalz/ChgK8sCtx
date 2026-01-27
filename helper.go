@@ -163,3 +163,27 @@ func confirmDelete(msg string) bool {
 
 	return selected == "Yes"
 }
+
+// For cleanup flag
+// Logic: if it doesn't used by any context, it is orphan
+func getOrphanUsers(config *KubeConfig) []string {
+	var orphans []string
+	for _, u := range config.Users {
+		usedBy := getUsedBy(config, "user", u.Name)
+		if len(usedBy) == 0 {
+			orphans = append(orphans, u.Name)
+		}
+	}
+	return orphans
+}
+
+func getOrphanClusters(config *KubeConfig) []string {
+	var orphans []string
+	for _, c := range config.Clusters {
+		usedBy := getUsedBy(config, "cluster", c.Name)
+		if len(usedBy) == 0 {
+			orphans = append(orphans, c.Name)
+		}
+	}
+	return orphans
+}

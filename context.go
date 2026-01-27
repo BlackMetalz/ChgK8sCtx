@@ -483,3 +483,51 @@ func deleteCluster(config *KubeConfig, path string, directArgs ...string) error 
 	fmt.Printf("Deleted cluster: %s\n", red(targetCluster))
 	return nil
 }
+
+func deleteOrphanData(config *KubeConfig, path string) error {
+	// get all orphan data first
+	orphanUsers := getOrphanUsers(config)
+	orphanClusters := getOrphanClusters(config)
+
+	// Check if any orphans exists, if not exit
+	if len(orphanUsers) == 0 && len(orphanClusters) == 0 {
+		fmt.Println(green("No orphan data found bro!"))
+		return nil
+	}
+
+	// Show all orphans
+	if len(orphanUsers) > 0 {
+		fmt.Printf("Found %d orphan users: %s\n", len(orphanUsers), yellow(strings.Join(orphanUsers, ", ")))
+	}
+
+	if len(orphanClusters) > 0 {
+		fmt.Printf("Found %d orphan clusters: %s\n", len(orphanClusters), yellow(strings.Join(orphanClusters, ", ")))
+	}
+
+	// Single confirm for both cluster and user
+	if !confirmDelete("Delete ALL orphan items?") {
+		fmt.Println("Cancelled.")
+		return nil
+	}
+
+	// Delete all orphan users
+	for _, u := range orphanUsers {
+		config.Users = removeUserByName(config.Users, u)
+		fmt.Printf("Deleted user: %s\n", red(u))
+	}
+
+	// Delete all orphan clusters
+	for _, c := range orphanClusters {
+		config.Clusters = removeClusterByName(config.Clusters, c)
+		fmt.Printf("Deleted cluster: %s\n", red(c))
+	}
+
+	// Save once at the end, after deletion!
+	if err := saveConfig(path, config); err != nil {
+		return err
+	}
+
+	fmt.Println(green("Deleted all orphan items successfully!"))
+	return nil
+
+}

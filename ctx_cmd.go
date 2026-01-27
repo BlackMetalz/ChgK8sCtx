@@ -16,6 +16,7 @@ var (
 	deleteFlag        bool // Default for delete context xD
 	deleteUserFlag    bool
 	deleteClusterFlag bool
+	cleanupFlag       bool // For clean up orphan user/cluster.
 )
 
 var ctxCmd = &cobra.Command{
@@ -78,6 +79,12 @@ var ctxCmd = &cobra.Command{
 			return
 		}
 
+		// --cleanup flag
+		if cleanupFlag {
+			deleteOrphanData(config, path)
+			return
+		}
+
 		if len(args) == 0 {
 			// Interactive mode
 			switchContext(config, path)
@@ -109,6 +116,9 @@ func init() {
 
 	// Add delete cluster Flag
 	ctxCmd.Flags().BoolVar(&deleteClusterFlag, "delete-cluster", false, "Delete cluster in kubeconfig")
+
+	// Add cleanup flag
+	ctxCmd.Flags().BoolVar(&cleanupFlag, "cleanup", false, "Delete orphan user/cluster in kubeconfig")
 
 	// Add ctx command to root command
 	rootCmd.AddCommand(ctxCmd)

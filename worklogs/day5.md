@@ -101,3 +101,6 @@ func getUsedBy(config *KubeConfig, itemType, name string) []string {}
 After delete user/cluster, I realized context will be broken. So gonna implement casade delete also with double confirmation when user delete user/cluster
 
 Yes, It works now, little mess of code but it works xD
+
+### Implement clean up for user/cluster that not used by any context
+Finished. With test data @testdata/kube_orphan
