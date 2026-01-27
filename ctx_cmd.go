@@ -10,10 +10,12 @@ import (
 // Add rename flag
 // Day5 updated: add listFlag / currentFlag
 var (
-	renameFlag  bool
-	listFlag    bool
-	currentFlag bool
-	deleteFlag  bool
+	renameFlag        bool
+	listFlag          bool
+	currentFlag       bool
+	deleteFlag        bool // Default for delete context xD
+	deleteUserFlag    bool
+	deleteClusterFlag bool
 )
 
 var ctxCmd = &cobra.Command{
@@ -62,6 +64,20 @@ var ctxCmd = &cobra.Command{
 			return
 		}
 
+		// For deleteUserFlag and deleteClusterFlag
+		if deleteUserFlag {
+			deleteUser(config, path, args...)
+			return
+		}
+
+		if deleteClusterFlag {
+			// deleteCluster(config, path, args...)
+			// LOL, we literal copy deleteUser function xD. But could use same function aswell without small change!
+			// Holy fucking shit, opportunity for refactoring again!
+			deleteCluster(config, path, args...)
+			return
+		}
+
 		if len(args) == 0 {
 			// Interactive mode
 			switchContext(config, path)
@@ -87,6 +103,12 @@ func init() {
 
 	// Add delete Flag
 	ctxCmd.Flags().BoolVarP(&deleteFlag, "delete", "x", false, "Delete context")
+
+	// Add delete user Flag
+	ctxCmd.Flags().BoolVar(&deleteUserFlag, "delete-user", false, "Delete user in kubeconfig")
+
+	// Add delete cluster Flag
+	ctxCmd.Flags().BoolVar(&deleteClusterFlag, "delete-cluster", false, "Delete cluster in kubeconfig")
 
 	// Add ctx command to root command
 	rootCmd.AddCommand(ctxCmd)

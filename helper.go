@@ -42,11 +42,13 @@ func red(s string) string {
 	return "\x1b[31m" + s + "\x1b[0m"
 }
 
-/*
 // Yellow text helper xD
 func yellow(s string) string {
 	return "\x1b[33m" + s + "\x1b[0m"
 }
+
+/*
+
 
 
 
@@ -77,4 +79,87 @@ func removeContextByName(contexts []Context, name string) []Context {
 		}
 	}
 	return result
+}
+
+// helper func for remove user from kubeconfig
+// Hmm, seem like same context, opportunity for refactoring!
+func removeUserByName(users []User, name string) []User {
+	var result []User
+	for _, user := range users {
+		if user.Name != name {
+			result = append(result, user)
+		}
+	}
+	return result
+}
+
+// Same bro!
+func removeClusterByName(clusters []Cluster, name string) []Cluster {
+	var result []Cluster
+	for _, c := range clusters {
+		if c.Name != name {
+			result = append(result, c)
+		}
+	}
+	return result
+}
+
+// Check if items exists in kubeconfig
+// Works with context,cluster,user
+func itemExists(config *KubeConfig, itemType, name string) bool {
+	switch itemType {
+	// Go idiom style
+	case "context":
+		for _, ctx := range config.Contexts {
+			if ctx.Name == name {
+				return true
+			}
+		}
+	case "cluster":
+		for _, c := range config.Clusters {
+			if c.Name == name {
+				return true
+			}
+		}
+	case "user":
+		for _, u := range config.Users {
+			if u.Name == name {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// Get contexts that use this user/cluster
+func getUsedBy(config *KubeConfig, itemType, name string) []string {
+	var result []string
+	for _, ctx := range config.Contexts {
+		switch itemType {
+		case "cluster":
+			if ctx.Context.Cluster == name {
+				result = append(result, ctx.Name)
+			}
+		case "user":
+			if ctx.Context.User == name {
+				result = append(result, ctx.Name)
+			}
+		}
+	}
+	return result
+}
+
+// Confirm delete prompt
+func confirmDelete(msg string) bool {
+	prompt := promptui.Select{
+		Label: msg,
+		Items: []string{"Yes", "No"},
+	}
+
+	_, selected, err := prompt.Run()
+	if err != nil {
+		return false
+	}
+
+	return selected == "Yes"
 }

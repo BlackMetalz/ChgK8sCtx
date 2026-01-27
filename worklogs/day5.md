@@ -85,3 +85,19 @@ Default namespace: zz
 I think I need to move them to debug mode, only show when --debug or -d flag added.
 
 Function no need to be uppercase, because in this simple approach, we dont use any other package, only main package.
+
+Lesson learned while working with cobra cli: it doesn't support multi character shorthand. So we need to use -- instead of - for those flags xD
+
+I don't want to refactor this code at the moment, but it just a bunch of mess, can not continue without refactor!
+
+So idea will be used: String type parameter for simply. I often used that in my project.
+```go
+func itemExists(config *KubeConfig, itemType, name string) bool {}
+
+func getUsedBy(config *KubeConfig, itemType, name string) []string {}
+
+```
+
+After delete user/cluster, I realized context will be broken. So gonna implement casade delete also with double confirmation when user delete user/cluster
+
+Yes, It works now, little mess of code but it works xD

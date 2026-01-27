@@ -386,3 +386,100 @@ func deleteContext(config *KubeConfig, kubeconfigPath string, directArgs ...stri
 	fmt.Printf("Deleted context: %s\n", red(targetContext))
 	return nil
 }
+
+// For Delete User in Kubeconfig file.
+func deleteUser(config *KubeConfig, path string, directArgs ...string) error {
+	var targetUser string
+	// get target user (interactive or direct mode)
+	if len(directArgs) == 1 {
+		targetUser = directArgs[0]
+		// Validate
+		if !itemExists(config, "user", targetUser) {
+			fmt.Printf("User '%s' not found bro!\n", red(targetUser))
+			return nil
+		}
+
+	} else {
+		// Interactive - prompt for select user to delete
+		var userList []string
+		for _, u := range config.Users {
+			userList = append(userList, u.Name)
+		}
+		prompt := promptui.Select{Label: "Select user", Items: userList}
+		_, targetUser, _ = prompt.Run()
+	}
+
+	// check usedBy. Shared logic
+	usedBy := getUsedBy(config, "user", targetUser)
+	if len(usedBy) > 0 {
+		fmt.Printf("Warning: Will ALSO delete context(s): %s\n", yellow(strings.Join(usedBy, ", ")))
+		if !confirmDelete("Delete this user AND related contexts?") {
+			fmt.Println("Cancelled.")
+			return nil
+		}
+
+		// Delete related context FIRST
+		for _, ctxName := range usedBy {
+			config.Contexts = removeContextByName(config.Contexts, ctxName)
+			fmt.Printf("Deleted context: %s\n", red(ctxName))
+		}
+
+	}
+
+	// Delete user
+	config.Users = removeUserByName(config.Users, targetUser)
+	if err := saveConfig(path, config); err != nil {
+		return err
+	}
+
+	fmt.Printf("Deleted user: %s\n", red(targetUser))
+	return nil
+}
+
+// for delete cluster in kubeconfig file
+func deleteCluster(config *KubeConfig, path string, directArgs ...string) error {
+	var targetCluster string
+	// get target cluster (interactive or direct mode)
+	if len(directArgs) == 1 {
+		targetCluster = directArgs[0]
+		// Validate
+		if !itemExists(config, "cluster", targetCluster) {
+			fmt.Printf("Cluster '%s' not found bro!\n", red(targetCluster))
+			return nil
+		}
+	} else {
+		// Interactive - prompt for select user to delete
+		var clusterList []string
+		for _, c := range config.Clusters {
+			clusterList = append(clusterList, c.Name)
+		}
+		prompt := promptui.Select{Label: "Select cluster", Items: clusterList}
+		_, targetCluster, _ = prompt.Run()
+
+	}
+
+	// check usedBy. Shared logic
+	usedBy := getUsedBy(config, "cluster", targetCluster)
+	if len(usedBy) > 0 {
+		fmt.Printf("Warning: Will ALSO delete context(s): %s\n", yellow(strings.Join(usedBy, ", ")))
+		if !confirmDelete("Delete cluster AND related contexts?") {
+			fmt.Println("Cancelled.")
+			return nil
+		}
+
+		// Delete related context FIRST
+		for _, ctxName := range usedBy {
+			config.Contexts = removeContextByName(config.Contexts, ctxName)
+			fmt.Printf("Deleted context: %s\n", red(ctxName))
+		}
+	}
+
+	// Delete cluster
+	config.Clusters = removeClusterByName(config.Clusters, targetCluster)
+	if err := saveConfig(path, config); err != nil {
+		return err
+	}
+
+	fmt.Printf("Deleted cluster: %s\n", red(targetCluster))
+	return nil
+}
