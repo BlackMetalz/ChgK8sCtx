@@ -149,3 +149,132 @@ func switchNamespace(config *KubeConfig, kubeconfigPath string) error {
 
 	return nil
 }
+
+// Handler for rename context
+func renameContext(config *KubeConfig, kubeconfigPath string, directArgs ...string) error {
+
+	// directArgs is slice of string and it takes more than 1 args, but we only handle 2 for now. haha
+	if len(directArgs) > 2 {
+		fmt.Println("Unsupported arguments, only 2 arguments are supported")
+		return nil
+	}
+
+	// So we gonna refactor this function to handle both interactive and direct mode
+	// Validation part for both modes need to be shared for "DRY"
+
+	// define
+	var oldName, newName string
+	var err error
+
+	if len(directArgs) == 2 {
+		// Direct mode here
+		oldName = directArgs[0]
+		newName = directArgs[1]
+	} else {
+		// Interactive mode here
+		// Build list context for selection, switchContext like.
+
+		var contextList []string
+		for _, ctx := range config.Contexts {
+			if ctx.Name == config.CurrentContext {
+				contextList = append(contextList, ctx.Name+"(current-context)")
+			} else {
+				contextList = append(contextList, ctx.Name)
+			}
+		}
+
+		// Prompt for context need to rename
+		selectPrompt := promptui.Select{
+			Label: "Select context to rename please",
+			Items: contextList,
+		}
+
+		_, selectedContext, err := selectPrompt.Run()
+		if err != nil {
+			return handlePromptError(err)
+		}
+
+		// Clean suffix if available
+		oldName = strings.TrimSuffix(selectedContext, "(current-context)")
+
+		// Prompt for fucking new name
+		inputPrompt := promptui.Prompt{
+			Label: "Enter for new context name",
+			// Default: oldName, // Pre-fill with old name
+			// We should not pick default value for input xD. It is just a distraction.
+		}
+
+		// Need to update for err, because we are in scope of else block.
+		// So we can not define like: newName, err := inputPrompt.Run()
+		newName, err = inputPrompt.Run()
+		if err != nil {
+			return handlePromptError(err)
+		}
+	}
+
+	// Simple validation for direct mode
+	if len(directArgs) == 2 {
+		found := false // Flag here
+		// Loop throught contexts...
+		for _, ctx := range config.Contexts {
+			if ctx.Name == oldName {
+				found = true
+				break // Found, no need to continue iteration!
+			}
+		}
+
+		// Yeah, if context not found, we can not rename it, right?
+		// What a simple validation bro!
+		if !found {
+			fmt.Printf("Context '%s' not found bro!\n", oldName)
+			return nil
+		}
+	}
+
+	// Validation newName to prevent duplicate with other context
+	// Still need to loop through all contexts
+	for _, ctx := range config.Contexts {
+		if ctx.Name == newName && ctx.Name != oldName {
+			fmt.Printf("Context '%s' already exists bro!\n", newName)
+			return nil
+		}
+		// Check if user enter same context name
+		if ctx.Name == newName {
+			fmt.Println("New name cannot be same as old name bro!")
+			return nil
+		}
+	}
+
+	if strings.TrimSpace(newName) == "" {
+		fmt.Println("New name cannot be empty bro!")
+		return nil
+	}
+
+	// Update config
+	// Loop through all context
+	for i := range config.Contexts {
+		// If found old name
+		if config.Contexts[i].Name == oldName {
+			// Update it with new name
+			config.Contexts[i].Name = newName
+
+			// We would add break here for performance
+			// I mean we don't need to continue loop after we found it, right?
+			break
+		}
+	}
+
+	// If we rename current-context, update it aswell
+	if config.CurrentContext == oldName {
+		config.CurrentContext = newName
+	}
+
+	// Save it
+	err = saveConfig(kubeconfigPath, config)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Renamed context: %s to %s\n", oldName, newName)
+	return nil
+}

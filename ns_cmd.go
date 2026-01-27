@@ -7,10 +7,20 @@ import (
 )
 
 var nsCmd = &cobra.Command{
-	Use:   "ns [namespace-name]",
+	Use:   "ns [namespace]",
 	Short: "Switch kubernetes namespace",
-	Long:  `Switch to a different kubernetes namespace. If no namespace name provided, show interactive selection.`,
-	Args:  cobra.MaximumNArgs(1), // Set max args to 1
+	Long: `Switch to a different kubernetes namespace. 
+Examples:
+  # Interactive mode - show selection menu
+  chg-k8s-ctx ns
+  
+  # Direct mode - switch immediately  
+  chg-k8s-ctx ns kube-public
+  chg-k8s-ctx ns my-namespace`,
+	// Add Example field (optional)
+	Example: `  chg-k8s-ctx ns
+  chg-k8s-ctx ns kube-public`,
+	Args: cobra.MaximumNArgs(1), // Set max args to 1
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("ns args: ", args)
 
@@ -23,8 +33,32 @@ var nsCmd = &cobra.Command{
 		} else if len(args) > 0 && args[0] == "kube-system" {
 			fmt.Println("You can't switch to kube-system namespace")
 		} else {
-			// Direct mode
-			fmt.Println("TODO: Direct mode")
+			// Direct mode. Set namespace without asking for selection
+			targetNS := args[0]
+
+			// Get current context entry
+			entry := getCurrentContextEntry(config)
+			if entry == nil {
+				fmt.Println("Error getting current context entry")
+				return
+			}
+
+			// Check namespace is currently selected
+			if entry.Context.Namespace == targetNS {
+				fmt.Println("Namespace is already selected")
+				return
+			}
+
+			// Update and save
+			entry.Context.Namespace = targetNS
+			err := saveConfig(path, config)
+			if err != nil {
+				fmt.Println("Error saving config: ", err)
+				return
+			}
+
+			fmt.Println("Namespace switched to: ", targetNS)
+
 		}
 
 	},
