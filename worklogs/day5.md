@@ -1,6 +1,6 @@
 # Day 5 - 27Jan-2026
 
-Finish CLI Args
+### Finish CLI Args
 
 - Change namespace without selection
 ```bash
@@ -41,3 +41,47 @@ ctx --rename old-name new-name # Direct mode if we know old name and new name. N
 
 A lot of joys while implement this feature. For the first time, i prove the code from AI is wrong xDD
 ![alt text](../images/day5.png)
+
+
+### Not really finish. Add more feature.
+- Add delete context feature. Should be KISS as pattern rename
+```bash
+ctx --delete              # Interactive: select from list
+ctx --delete my-context   # Direct: delete specified context
+```
+
+- Allow delete current context but will auto switch to other context if available. Don't allow delete if there is only 1 context.
+
+- Add option to delete specific user/cluster (ctx delete user/cluster)
+```bash
+ctx --delete-user admin@cluster
+ctx --delete-cluster my-cluster
+```
+This could be tricky, cluster/user can be used by multiple context. Need a warning message like "This user/cluster is used by 3 contexts. Delete anyway?? (y/n)"
+
+- Add option to view all context/ current context (ctx view)
+```bash
+ctx --list    # hoặc ctx -l
+ctx --current # hoặc ctx -c
+```
+
+--> Usage: clean up kubeconfig file
+
+Little harder logic to handle.
+
+
+Approach:
+1. `--list` / `--current` for easy start
+2. `--delete` context
+3. `--delete-user` / `--delete-cluster` hardest in this section.
+
+
+While implement show current context / list context. Following information seem like useless
+```
+Current context: staging-cluster-renamed
+Default namespace: zz
+```
+
+I think I need to move them to debug mode, only show when --debug or -d flag added.
+
+Function no need to be uppercase, because in this simple approach, we dont use any other package, only main package.

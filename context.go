@@ -278,3 +278,36 @@ func renameContext(config *KubeConfig, kubeconfigPath string, directArgs ...stri
 	fmt.Printf("Renamed context: %s to %s\n", oldName, newName)
 	return nil
 }
+
+// List context for flag -c and -l
+func listContexts(config *KubeConfig) {
+	for _, ctx := range config.Contexts {
+		// Show current context with different color? xD
+		if ctx.Name == config.CurrentContext {
+			fmt.Println(green(ctx.Name))
+			// With printf, no space LOL
+		} else {
+			fmt.Println(ctx.Name)
+		}
+	}
+}
+
+// Show some useful information about current context xD
+func showCurrentContext(config *KubeConfig) {
+	// Print current context name
+	fmt.Printf("Context: %s\n", green(config.CurrentContext))
+
+	// Print user and cluster for current context
+	for _, ctx := range config.Contexts {
+		if ctx.Name == config.CurrentContext {
+			fmt.Printf("Cluster: %s\n", green(ctx.Context.Cluster))
+			fmt.Printf("User: %s\n", green(ctx.Context.User))
+			if ctx.Context.Namespace != "" {
+				fmt.Printf("Namespace: %s\n", green(ctx.Context.Namespace))
+			} else {
+				fmt.Printf("Namespace: %s\n", green("(default)"))
+			}
+			break // quit iteration after found xD
+		}
+	}
+}

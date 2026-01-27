@@ -8,7 +8,12 @@ import (
 )
 
 // Add rename flag
-var renameFlag bool
+// Day5 updated: add listFlag / currentFlag
+var (
+	renameFlag  bool
+	listFlag    bool
+	currentFlag bool
+)
 
 var ctxCmd = &cobra.Command{
 	Use:   "ctx [context-name]",
@@ -18,9 +23,22 @@ var ctxCmd = &cobra.Command{
 	// Run when user type 'chg-k8s-ctx ctx'
 	Args: cobra.MaximumNArgs(2), // 0 or 2 arguments
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ctx args: ", args)
+		// fmt.Println("ctx args: ", args) // No need to debug anymoar xD
 		path, _ := getKubeconfigPath()
 		config, _ := loadConfig(path)
+
+		// --list flag
+		if listFlag {
+			// fmt.Println("List all contexts")
+			listContexts(config)
+			return
+		}
+
+		// --current flag
+		if currentFlag {
+			showCurrentContext(config)
+			return
+		}
 
 		// rename mode
 		if renameFlag {
@@ -41,8 +59,8 @@ var ctxCmd = &cobra.Command{
 			// Interactive mode
 			switchContext(config, path)
 		} else {
-			// Direct mode
-			fmt.Println("TODO: Direct mode: ", args[0])
+			// exception xD
+			fmt.Println("This tool does not support arguments like this: ", args[0])
 		}
 	},
 }
@@ -50,7 +68,15 @@ var ctxCmd = &cobra.Command{
 func init() {
 	// Rename flag here
 	// Param for BoolVar: pointer to variable, name of flag, default value, description
+	// BoolVar defines a bool flag with specified name, default value, and usage string
 	ctxCmd.Flags().BoolVar(&renameFlag, "rename", false, "Rename context")
+
+	// Add list Flag
+	// BoolVarP is like BoolVar, but accepts a shorthand letter that can be used after a single dash.
+	ctxCmd.Flags().BoolVarP(&listFlag, "list", "l", false, "List all contexts")
+
+	// Add current Flag
+	ctxCmd.Flags().BoolVarP(&currentFlag, "current", "c", false, "Show current context")
 
 	// Add ctx command to root command
 	rootCmd.AddCommand(ctxCmd)

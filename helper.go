@@ -31,3 +31,35 @@ func handlePromptError(err error) error {
 		return fmt.Errorf("prompt failed: %v", err)
 	}
 }
+
+// Green text helper xD
+func green(s string) string {
+	return "\x1b[32m" + s + "\x1b[0m"
+}
+
+/*
+// Yellow text helper xD
+func yellow(s string) string {
+	return "\x1b[33m" + s + "\x1b[0m"
+}
+
+// Red text helper xD
+func red(s string) string {
+	return "\x1b[31m" + s + "\x1b[0m"
+}
+
+// Blue text helper xD
+func blue(s string) string {
+	return "\x1b[34m" + s + "\x1b[0m"
+}
+
+// Magenta text helper xD
+func magenta(s string) string {
+	return "\x1b[35m" + s + "\x1b[0m"
+}
+
+// Cyan text helper xD
+func cyan(s string) string {
+	return "\x1b[36m" + s + "\x1b[0m"
+}
+*/

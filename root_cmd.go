@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var debugMode bool
+
 var rootCmd = &cobra.Command{
 	Use:   "chg-k8s-ctx",
 	Short: "A kubectx/kubens clone written in Go for learning purpose",
@@ -18,6 +20,12 @@ var rootCmd = &cobra.Command{
 		fmt.Println("No subcommand specified, please use 'ctx' for change context or 'ns' for change default namespace")
 
 	},
+}
+
+func init() {
+	// PersistentFlags returns the persistent FlagSet specifically set in the current command.
+	// We need to add this flag to root command so that it can be used by all subcommands.
+	rootCmd.PersistentFlags().BoolVarP(&debugMode, "debug", "d", false, "Enable debug mode, show debug information xD")
 }
 
 // This func will be called by main.go

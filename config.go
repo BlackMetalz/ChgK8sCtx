@@ -37,14 +37,17 @@ func loadConfig(path string) (*KubeConfig, error) {
 	}
 
 	// List context of K8S
-	fmt.Println("Current context:", config.CurrentContext)
+	// Now we have debug mode, we need to put this into debug
+	if debugMode {
+		fmt.Println("[DEBUG] Current context:", config.CurrentContext)
 
-	// Print current namespace if not empty
-	for _, ctx := range config.Contexts {
-		if ctx.Name == config.CurrentContext {
-			if ctx.Context.Namespace != "" {
-				fmt.Println("Default namespace:", ctx.Context.Namespace)
-				break
+		// Print current namespace if not empty
+		for _, ctx := range config.Contexts {
+			if ctx.Name == config.CurrentContext {
+				if ctx.Context.Namespace != "" {
+					fmt.Println("[DEBUG] Default namespace:", ctx.Context.Namespace)
+					break
+				}
 			}
 		}
 	}
