@@ -41,7 +41,7 @@ var ctxCmd = &cobra.Command{
 			return
 		}
 
-		// --current flag
+		// --current/-c flag
 		if currentFlag {
 			showCurrentContext(config)
 			return
@@ -95,12 +95,12 @@ var ctxCmd = &cobra.Command{
 			// Direct switch: ctx ctx-name
 			targetCtx := args[0]
 			if !itemExists(config, "context", targetCtx) {
-				fmt.Printf("Context '%s' does not exist\n", targetCtx)
+				fmt.Printf("Context %s does not exist\n", red(targetCtx))
 				return
 			}
 
 			if targetCtx == config.CurrentContext {
-				fmt.Printf("You are already on context '%s'\n", targetCtx)
+				fmt.Printf("You are already on context %s\n", yellow(targetCtx))
 				return
 			}
 
@@ -113,10 +113,10 @@ var ctxCmd = &cobra.Command{
 				return
 			}
 
-			fmt.Printf("Switched to context '%s'\n", targetCtx)
+			fmt.Printf("Switched to context %s\n", green(targetCtx))
 		} else {
 			// exception xD
-			fmt.Println("Too many arguments")
+			fmt.Println(red("Too many arguments"))
 		}
 	},
 }

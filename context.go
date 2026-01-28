@@ -118,7 +118,7 @@ func switchNamespace(config *KubeConfig, kubeconfigPath string) error {
 
 	// Ask user to enter namespace
 	prompt := promptui.Select{
-		Label: "Select namespace",
+		Label: "Select default namespace for current context " + green(config.CurrentContext),
 		Items: displayList,
 	}
 
@@ -226,7 +226,7 @@ func renameContext(config *KubeConfig, kubeconfigPath string, directArgs ...stri
 		// Yeah, if context not found, we can not rename it, right?
 		// What a simple validation bro!
 		if !found {
-			fmt.Printf("Context '%s' not found bro!\n", oldName)
+			fmt.Printf("Context %s not found bro!\n", red(oldName))
 			return nil
 		}
 	}
@@ -235,7 +235,7 @@ func renameContext(config *KubeConfig, kubeconfigPath string, directArgs ...stri
 	// Still need to loop through all contexts
 	for _, ctx := range config.Contexts {
 		if ctx.Name == newName && ctx.Name != oldName {
-			fmt.Printf("Context '%s' already exists bro!\n", newName)
+			fmt.Printf("Context %s already exists bro!\n", red(newName))
 			return nil
 		}
 		// Check if user enter same context name
@@ -295,6 +295,7 @@ func listContexts(config *KubeConfig) {
 // Show some useful information about current context xD
 func showCurrentContext(config *KubeConfig) {
 	// Print current context name
+	fmt.Println(strings.Repeat("=", 10) + "Current context" + strings.Repeat("=", 10))
 	fmt.Printf("Context: %s\n", green(config.CurrentContext))
 
 	// Print user and cluster for current context
@@ -310,6 +311,7 @@ func showCurrentContext(config *KubeConfig) {
 			break // quit iteration after found xD
 		}
 	}
+	fmt.Println(strings.Repeat("=", 35))
 }
 
 // func for delete context
@@ -338,7 +340,7 @@ func deleteContext(config *KubeConfig, kubeconfigPath string, directArgs ...stri
 		}
 
 		if !found {
-			fmt.Printf("Context '%s' not found bro!\n", red(targetContext))
+			fmt.Printf("Context %s not found bro!\n", red(targetContext))
 			return nil
 		}
 	} else {
@@ -395,7 +397,7 @@ func deleteUser(config *KubeConfig, path string, directArgs ...string) error {
 		targetUser = directArgs[0]
 		// Validate
 		if !itemExists(config, "user", targetUser) {
-			fmt.Printf("User '%s' not found bro!\n", red(targetUser))
+			fmt.Printf("User %s not found bro!\n", red(targetUser))
 			return nil
 		}
 
@@ -454,7 +456,7 @@ func deleteCluster(config *KubeConfig, path string, directArgs ...string) error 
 		targetCluster = directArgs[0]
 		// Validate
 		if !itemExists(config, "cluster", targetCluster) {
-			fmt.Printf("Cluster '%s' not found bro!\n", red(targetCluster))
+			fmt.Printf("Cluster %s not found bro!\n", red(targetCluster))
 			return nil
 		}
 	} else {

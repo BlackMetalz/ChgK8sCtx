@@ -33,7 +33,7 @@ Examples:
 			// Interactive mode
 			switchNamespace(config, path)
 		} else if len(args) > 0 && args[0] == "kube-system" {
-			fmt.Println("You can't switch to kube-system namespace")
+			fmt.Println(red("You can't switch to kube-system namespace"))
 		} else {
 			// Direct mode. Set namespace without asking for selection
 			targetNS := args[0]
@@ -47,7 +47,7 @@ Examples:
 
 			// Check namespace is currently selected
 			if entry.Context.Namespace == targetNS {
-				fmt.Println("Namespace is already selected")
+				fmt.Println(red("Namespace is already selected"))
 				return
 			}
 

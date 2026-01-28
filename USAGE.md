@@ -131,7 +131,7 @@ go run . ctx non-existent
 
 # Switch to current context (already active)
 go run . ctx dev-cluster
-# Expected: "You are already on context 'dev-cluster'"
+# Expected: "You are already on context dev-cluster"
 
 # Delete last remaining context
 go run . ctx --delete
