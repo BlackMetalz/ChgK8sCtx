@@ -22,7 +22,9 @@ Examples:
   chg-k8s-ctx ns kube-public`,
 	Args: cobra.MaximumNArgs(1), // Set max args to 1
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ns args: ", args)
+		if debugMode {
+			fmt.Println("ns args: ", args)
+		}
 
 		path, _ := getKubeconfigPath()
 		config, _ := loadConfig(path)

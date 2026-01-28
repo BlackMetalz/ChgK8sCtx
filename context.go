@@ -406,7 +406,12 @@ func deleteUser(config *KubeConfig, path string, directArgs ...string) error {
 			userList = append(userList, u.Name)
 		}
 		prompt := promptui.Select{Label: "Select user", Items: userList}
-		_, targetUser, _ = prompt.Run()
+		var err error // Need to define err var before using it
+		_, targetUser, err = prompt.Run()
+		if err != nil {
+			// Use Helper func to handle Prompt Errors
+			return handlePromptError(err)
+		}
 	}
 
 	// check usedBy. Shared logic
@@ -422,8 +427,13 @@ func deleteUser(config *KubeConfig, path string, directArgs ...string) error {
 		for _, ctxName := range usedBy {
 			config.Contexts = removeContextByName(config.Contexts, ctxName)
 			fmt.Printf("Deleted context: %s\n", red(ctxName))
-		}
 
+			// Auto switch if deleted current context
+			if ctxName == config.CurrentContext && len(config.Contexts) > 0 {
+				config.CurrentContext = config.Contexts[0].Name
+				fmt.Printf("Auto switched to context: %s\n", green(config.CurrentContext))
+			}
+		}
 	}
 
 	// Delete user
@@ -454,7 +464,12 @@ func deleteCluster(config *KubeConfig, path string, directArgs ...string) error 
 			clusterList = append(clusterList, c.Name)
 		}
 		prompt := promptui.Select{Label: "Select cluster", Items: clusterList}
-		_, targetCluster, _ = prompt.Run()
+		var err error // Need to define err var before using it
+		_, targetCluster, err = prompt.Run()
+		if err != nil {
+			// Use Helper func to handle Prompt Errors
+			return handlePromptError(err)
+		}
 
 	}
 
@@ -471,6 +486,12 @@ func deleteCluster(config *KubeConfig, path string, directArgs ...string) error 
 		for _, ctxName := range usedBy {
 			config.Contexts = removeContextByName(config.Contexts, ctxName)
 			fmt.Printf("Deleted context: %s\n", red(ctxName))
+
+			// Auto switch if deleted current context
+			if ctxName == config.CurrentContext && len(config.Contexts) > 0 {
+				config.CurrentContext = config.Contexts[0].Name
+				fmt.Printf("Auto switched to context: %s\n", green(config.CurrentContext))
+			}
 		}
 	}
 

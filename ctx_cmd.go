@@ -27,7 +27,10 @@ var ctxCmd = &cobra.Command{
 	// Run when user type 'chg-k8s-ctx ctx'
 	Args: cobra.MaximumNArgs(2), // 0 or 2 arguments
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("ctx args: ", args) // No need to debug anymoar xD
+		if debugMode {
+			fmt.Println("ctx args: ", args)
+		}
+
 		path, _ := getKubeconfigPath()
 		config, _ := loadConfig(path)
 
@@ -88,9 +91,32 @@ var ctxCmd = &cobra.Command{
 		if len(args) == 0 {
 			// Interactive mode
 			switchContext(config, path)
+		} else if len(args) == 1 {
+			// Direct switch: ctx ctx-name
+			targetCtx := args[0]
+			if !itemExists(config, "context", targetCtx) {
+				fmt.Printf("Context '%s' does not exist\n", targetCtx)
+				return
+			}
+
+			if targetCtx == config.CurrentContext {
+				fmt.Printf("You are already on context '%s'\n", targetCtx)
+				return
+			}
+
+			// Update struct
+			config.CurrentContext = targetCtx
+
+			err := saveConfig(path, config)
+			if err != nil {
+				fmt.Printf("Error writing to file: %v\n", err)
+				return
+			}
+
+			fmt.Printf("Switched to context '%s'\n", targetCtx)
 		} else {
 			// exception xD
-			fmt.Println("This tool does not support arguments like this: ", args[0])
+			fmt.Println("Too many arguments")
 		}
 	},
 }

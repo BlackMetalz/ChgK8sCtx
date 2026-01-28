@@ -24,6 +24,7 @@ go run . <command>
 | `ctx -c` | Show current context |
 | `ctx --rename` | Rename a context (interactive) |
 | `ctx -x` | Delete a context (interactive) |
+| `ctx --delete` | Delete a context (interactive) |
 | `ctx --delete-user` | Delete user (cascade deletes related contexts) |
 | `ctx --delete-cluster` | Delete cluster (cascade deletes related contexts) |
 | `ctx --cleanup` | Delete orphan users/clusters |
@@ -88,6 +89,7 @@ go run . ctx -l           # Verify
 ### 4. Delete Context
 ```bash
 go run . ctx -x           # Interactive delete
+go run . ctx --delete     # Interactive delete
 go run . ctx -l           # Verify deleted
 ```
 
@@ -113,6 +115,31 @@ go run . ctx --cleanup
 # Found 3 orphan users: orphan-user-1, orphan-user-2, old-admin
 # Found 2 orphan clusters: orphan-cluster-1, orphan-cluster-2
 # Delete ALL orphan items? [Yes/No]
+```
+
+### 8. Direct Rename
+```bash
+go run . ctx --rename old-name new-name
+go run . ctx -l           # Verify renamed
+```
+
+### 9. Error/Edge Cases
+```bash
+# Switch to non-existent context
+go run . ctx non-existent
+# Expected: "Context 'non-existent' does not exist"
+
+# Switch to current context (already active)
+go run . ctx dev-cluster
+# Expected: "You are already on context 'dev-cluster'"
+
+# Delete last remaining context
+go run . ctx --delete
+# Expected: "Cannot delete the only 1 context left!"
+
+# Delete user with cascade
+go run . ctx --delete-user
+# If user is current-context's user → auto-switches after delete
 ```
 
 ---
