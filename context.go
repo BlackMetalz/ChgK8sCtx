@@ -66,7 +66,15 @@ func switchContext(config *KubeConfig, kubeconfigPath string) error {
 	// Remove (current-context) from result. StrimSuffix first, update struct later on.
 	result = strings.TrimSuffix(result, "(current-context)")
 	// Update struct
+	oldContext := config.CurrentContext
 	config.CurrentContext = result
+
+	// Save previous context
+	err = savePreviousContext(oldContext)
+	if err != nil {
+		fmt.Println("Error saving previous context")
+		return err
+	}
 
 	// saveConfig
 	err = saveConfig(kubeconfigPath, config) // config is pointer already.

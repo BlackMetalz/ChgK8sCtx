@@ -33,3 +33,5 @@ go.work.sum
 
 # For this project
 testdata/*.bak
+testdata/chg-k8s-ctx-history
+chg-test

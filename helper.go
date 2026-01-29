@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/sahilm/fuzzy"
@@ -207,4 +209,53 @@ func fuzzyFindContext(config *KubeConfig, query string) []string {
 	}
 
 	return results
+}
+
+// For history switch back
+func savePreviousContext(ctx string) error {
+	// Write to history file
+	filePath, err := getHistoryFilePath()
+	if err != nil {
+		return err
+	}
+
+	// Open file with truncate mode to overwrite
+	file, err := os.OpenFile(filePath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Write context name to file
+	// Alway replace/overwrite file, because support last history, not history list
+	_, err = file.WriteString(ctx + "\n")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func loadPreviousContext() (string, error) {
+	// read from history file
+	filePath, err := getHistoryFilePath()
+	if err != nil {
+		return "", err
+	}
+
+	// Open file in read mode
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// Read file content. Since this will have only 1 line as we expected from savePreviousContext()
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(data)), nil
+
 }

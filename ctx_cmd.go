@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -91,6 +92,31 @@ var ctxCmd = &cobra.Command{
 		if len(args) == 0 {
 			// Interactive mode
 			switchContext(config, path)
+		} else if len(args) == 1 && args[0] == "-" {
+			// Load previous context
+			prevCtx, err := loadPreviousContext()
+			if err != nil {
+				fmt.Println("Error loading previous context")
+				return
+			}
+			// Switch to previous context
+			prevCtx = strings.TrimSpace(prevCtx) // Remove trailing \n
+			// Don't forget to save previous context
+			oldCtx := config.CurrentContext
+			savePreviousContext(oldCtx)
+
+			// Update struct for current context
+			config.CurrentContext = prevCtx
+
+			// Save config
+			err = saveConfig(path, config)
+			if err != nil {
+				fmt.Printf("Error writing to file: %v\n", err)
+				return
+			}
+
+			fmt.Printf("Switched to context %s\n", green(prevCtx))
+
 		} else if len(args) == 1 {
 			// Direct switch: ctx ctx-name
 			targetCtx := args[0]
@@ -109,9 +135,21 @@ var ctxCmd = &cobra.Command{
 
 			// Check exact match
 			if itemExists(config, "context", targetCtx) {
+
+				// Save previous context BEFORE switch
+				// Without this shit, we can't switch back to previous context
+				savePreviousContext(config.CurrentContext)
+
 				// Update struct
 				config.CurrentContext = targetCtx
-				// return // No return, lets it fall through to save config
+				// Save config
+				err := saveConfig(path, config)
+				if err != nil {
+					fmt.Printf("Error writing to file: %v\n", err)
+					return
+				}
+
+				fmt.Printf("Switched to context %s\n", green(targetCtx))
 			} else {
 				// Fuzzy search handle here.
 				matches := fuzzyFindContext(config, targetCtx)
@@ -125,6 +163,10 @@ var ctxCmd = &cobra.Command{
 				case 1:
 					targetCtx = matches[0] // use single match to match context
 					// Because we only able to choose one context, we can just use the first match
+
+					// Save previous context BEFORE switch
+					savePreviousContext(config.CurrentContext)
+
 					// Update struct
 					config.CurrentContext = targetCtx
 					fmt.Printf("Fuzzy matched: %s\n", green(targetCtx))
@@ -132,21 +174,22 @@ var ctxCmd = &cobra.Command{
 					fmt.Printf("Multiple matches for '%s' : %v\n", targetCtx, matches)
 					return
 				}
-			}
 
-			// Save config
-			err := saveConfig(path, config)
-			if err != nil {
-				fmt.Printf("Error writing to file: %v\n", err)
-				return
-			}
+				// Save config
+				err := saveConfig(path, config)
+				if err != nil {
+					fmt.Printf("Error writing to file: %v\n", err)
+					return
+				}
 
-			fmt.Printf("Switched to context %s\n", green(targetCtx))
+				fmt.Printf("Switched to context %s\n", green(targetCtx))
+			}
 
 		} else {
 			// exception xD
 			fmt.Println(red("Too many arguments"))
 		}
+
 	},
 }
 

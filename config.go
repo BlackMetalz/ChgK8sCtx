@@ -8,6 +8,9 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
+// For context switch back (ctx -)
+const historyFileName = "chg-k8s-ctx-history"
+
 // Parse kubeconfig file to struct
 func loadConfig(path string) (*KubeConfig, error) {
 	// Look at the func ReadFile. We don't need to talk about param
@@ -125,4 +128,16 @@ func getKubeconfigPath() (string, error) {
 		fmt.Println("Using default kubeconfig path:", defaultPath)
 		return defaultPath, nil
 	}
+}
+
+// Get history file Path - For multiple OS support
+func getHistoryFilePath() (string, error) {
+	kubeconfigPath, err := getKubeconfigPath() // DRY
+	if err != nil {
+		return "", err
+	}
+
+	// History file same folder with kubeconfig
+	dir := filepath.Dir(kubeconfigPath)
+	return filepath.Join(dir, historyFileName), nil
 }
