@@ -21,3 +21,8 @@ And this time I think only support last context is great, no need to support mul
 
 ### Implement merge command
 Simple merge logic, just merge 2 files and save to output file xD
+
+### Implement validate command
+nothing much to explain, just validate orphaned context/user/cluster, instead of cleaning, we just show them. Hmm seem like useless feature, why not add to cleanup command? with extra flag to show orphaned context/user/cluster??
+
+Hmm, but not really. `ctx validate` could be useful for CICD when it is going to check for exit code. Just keep it.

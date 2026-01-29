@@ -43,7 +43,7 @@ No idea, need to finish others first!
 ctx prompt   # Returns: "dev-cluster/kube-system"
 ```
 
-### 6. Config Validation --> 
+### 6. Config Validation --> Done
 Willing to implement.
 ```bash
 ctx validate  # Check for broken references

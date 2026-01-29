@@ -30,6 +30,7 @@ go run . <command>
 | `ctx --delete-cluster` | Delete cluster (cascade deletes related contexts) |
 | `ctx --cleanup` | Delete orphan users/clusters |
 | `ctx merge <src1> <src2> -o <output>` | Merge two kubeconfig files |
+| `ctx validate` | Validate kubeconfig for broken references |
 
 #### Fuzzy Search
 ```bash
@@ -227,4 +228,20 @@ export KUBECONFIG=testdata/kubeconfig
 
 # Cleanup test files
 rm -f testdata/merged.yaml testdata/conflict-test.yaml
+```
+
+### 11. Validate Config
+```bash
+# Test with broken config
+./chg-test --kubeconfig testdata/kubeconfig.broken ctx validate
+# Expected output:
+# Context ghost-user references non-existent user
+# Context broken-cluster-ctx references non-existent cluster
+# Context non-existent-user references non-existent user
+# Context totally-broken-ctx references non-existent cluster
+# Current context broken-context references non-existent context
+
+# Test with valid config
+./chg-test --kubeconfig testdata/kubeconfig.original ctx validate
+# Expected: No orphaned context/user/cluster found
 ```
