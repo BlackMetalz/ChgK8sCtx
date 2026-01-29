@@ -70,7 +70,7 @@ func saveConfig(path string, config *KubeConfig) error {
 	_data, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Println("Error reading file:", err)
-		return err // Because we return 2 values
+		return err // Because we return error
 	}
 
 	// Backup file path.
@@ -104,8 +104,28 @@ func saveConfig(path string, config *KubeConfig) error {
 	return nil
 }
 
+// Design for write config to file. Used for ctx merge command.
+// Since I don't want to edit saveConfig() func xD
+func writeConfig(path string, config *KubeConfig) error {
+	newData, err := yaml.Marshal(config)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, newData, 0600)
+}
+
 // Get default kubeconfig path
 func getKubeconfigPath() (string, error) {
+	// 1. Kubeconfig
+	// 2. KUBECONFIG env var
+	// 3. Default kubeconfig
+
+	if kubeconfigFlag != "" {
+		fmt.Println("Using --kubeconfig flag: ", kubeconfigFlag)
+		return kubeconfigFlag, nil
+	}
+
 	// Check if KUBECONFIG environment variable is set
 	// This is a common Go idiom where the variable is declared and checked in the same line.
 	// I'm trying to become GO idiom LOL

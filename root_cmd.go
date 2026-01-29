@@ -7,7 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var debugMode bool
+var (
+	debugMode      bool
+	kubeconfigFlag string
+)
 
 var rootCmd = &cobra.Command{
 	Use:   "chg-k8s-ctx",
@@ -26,6 +29,8 @@ func init() {
 	// PersistentFlags returns the persistent FlagSet specifically set in the current command.
 	// We need to add this flag to root command so that it can be used by all subcommands.
 	rootCmd.PersistentFlags().BoolVarP(&debugMode, "debug", "d", false, "Enable debug mode, show debug information xD")
+	// Add kubeconfig flag
+	rootCmd.PersistentFlags().StringVar(&kubeconfigFlag, "kubeconfig", "", "Path to kubeconfig file specified")
 }
 
 // This func will be called by main.go

@@ -29,6 +29,7 @@ go run . <command>
 | `ctx --delete-user` | Delete user (cascade deletes related contexts) |
 | `ctx --delete-cluster` | Delete cluster (cascade deletes related contexts) |
 | `ctx --cleanup` | Delete orphan users/clusters |
+| `ctx merge <src1> <src2> -o <output>` | Merge two kubeconfig files |
 
 #### Fuzzy Search
 ```bash
@@ -50,6 +51,14 @@ ctx cluster      # Multiple matches → shows list
 | Flag | Description |
 |------|-------------|
 | `-d, --debug` | Enable debug output |
+| `--kubeconfig <path>` | Use alternate kubeconfig file (overrides KUBECONFIG env) |
+
+#### Kubeconfig Priority
+```
+1. --kubeconfig flag (highest)
+2. KUBECONFIG env var
+3. ~/.kube/config (default)
+```
 
 ---
 
@@ -173,6 +182,49 @@ export KUBECONFIG=testdata/kubeconfig
 
 ## Debug Mode
 ```bash
-go run . -d ctx           # Debug + context
-go run . --debug ns       # Debug + namespace
+./chg-test -d ctx           # Debug + context
+./chg-test --debug ns       # Debug + namespace
+```
+
+### 9. Alternate Kubeconfig (`--kubeconfig`)
+```bash
+# Use different kubeconfig file
+./chg-test --kubeconfig testdata/kubeconfig.merge1 ctx -l
+# Expected: dev-cluster, staging-cluster
+
+./chg-test --kubeconfig testdata/kubeconfig.merge2 ctx -l
+# Expected: prod-cluster, aws-cluster
+
+# Switch context in alternate file
+./chg-test --kubeconfig testdata/kubeconfig.merge1 ctx staging-cluster
+```
+
+### 10. Merge Kubeconfig Files
+```bash
+# Basic merge
+./chg-test ctx merge testdata/kubeconfig.merge1 testdata/kubeconfig.merge2 -o testdata/merged.yaml
+# Expected: Merged successfully to: testdata/merged.yaml
+
+# Verify merged file
+./chg-test --kubeconfig testdata/merged.yaml ctx -l
+# Expected: dev-cluster, staging-cluster, prod-cluster, aws-cluster
+
+# Test conflict handling (merge same file)
+./chg-test ctx merge testdata/kubeconfig.merge1 testdata/kubeconfig.merge1 -o testdata/conflict-test.yaml
+# Expected:
+# Warning: Cluster dev-cluster already exists, skipping
+# Warning: Cluster staging-cluster already exists, skipping
+# Warning: User dev-admin already exists, skipping
+# Warning: User staging-admin already exists, skipping
+# Warning: Context dev-cluster already exists, skipping
+# Warning: Context staging-cluster already exists, skipping
+# Merged successfully to: testdata/conflict-test.yaml
+./chg-test --kubeconfig testdata/conflict-test.yaml ctx -l
+# Expected:
+# Using --kubeconfig flag:  testdata/conflict-test.yaml
+# dev-cluster
+# staging-cluster
+
+# Cleanup test files
+rm -f testdata/merged.yaml testdata/conflict-test.yaml
 ```
