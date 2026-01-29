@@ -94,19 +94,47 @@ var ctxCmd = &cobra.Command{
 		} else if len(args) == 1 {
 			// Direct switch: ctx ctx-name
 			targetCtx := args[0]
-			if !itemExists(config, "context", targetCtx) {
-				fmt.Printf("Context %s does not exist\n", red(targetCtx))
-				return
-			}
 
+			// Check if current context first.
 			if targetCtx == config.CurrentContext {
 				fmt.Printf("You are already on context %s\n", yellow(targetCtx))
 				return
 			}
 
-			// Update struct
-			config.CurrentContext = targetCtx
+			// Replace item exists with additional fuzzy search
+			// if !itemExists(config, "context", targetCtx) {
+			// 	fmt.Printf("Context %s does not exist\n", red(targetCtx))
+			// 	return
+			// }
 
+			// Check exact match
+			if itemExists(config, "context", targetCtx) {
+				// Update struct
+				config.CurrentContext = targetCtx
+				// return // No return, lets it fall through to save config
+			} else {
+				// Fuzzy search handle here.
+				matches := fuzzyFindContext(config, targetCtx)
+
+				// Switch like Go idiom xD
+				// Count matches from fuzzy search to handle different cases
+				switch len(matches) {
+				case 0:
+					fmt.Printf("Context %s does not exist\n", red(targetCtx))
+					return
+				case 1:
+					targetCtx = matches[0] // use single match to match context
+					// Because we only able to choose one context, we can just use the first match
+					// Update struct
+					config.CurrentContext = targetCtx
+					fmt.Printf("Fuzzy matched: %s\n", green(targetCtx))
+				default:
+					fmt.Printf("Multiple matches for '%s' : %v\n", targetCtx, matches)
+					return
+				}
+			}
+
+			// Save config
 			err := saveConfig(path, config)
 			if err != nil {
 				fmt.Printf("Error writing to file: %v\n", err)
@@ -114,6 +142,7 @@ var ctxCmd = &cobra.Command{
 			}
 
 			fmt.Printf("Switched to context %s\n", green(targetCtx))
+
 		} else {
 			// exception xD
 			fmt.Println(red("Too many arguments"))

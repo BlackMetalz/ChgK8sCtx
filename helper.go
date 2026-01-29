@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/manifoldco/promptui"
+	"github.com/sahilm/fuzzy"
 )
 
 // getCurrentContextEntry returns pointer to the current context entry
@@ -186,4 +187,24 @@ func getOrphanClusters(config *KubeConfig) []string {
 		}
 	}
 	return orphans
+}
+
+// For Fuzzy Search
+func fuzzyFindContext(config *KubeConfig, query string) []string {
+	// get all context names
+	var ctxNames []string
+	for _, ctx := range config.Contexts {
+		ctxNames = append(ctxNames, ctx.Name)
+	}
+
+	// Fuzzy search
+	matches := fuzzy.Find(query, ctxNames)
+
+	// Extract matched names
+	var results []string
+	for _, match := range matches {
+		results = append(results, match.Str)
+	}
+
+	return results
 }

@@ -19,7 +19,7 @@ go run . <command>
 | Command | Description |
 |---------|-------------|
 | `ctx` | Interactive context switch |
-| `ctx <name>` | Direct switch to context |
+| `ctx <name>` | Direct switch to context (supports fuzzy search) |
 | `ctx -l` | List all contexts |
 | `ctx -c` | Show current context |
 | `ctx --rename` | Rename a context (interactive) |
@@ -28,6 +28,14 @@ go run . <command>
 | `ctx --delete-user` | Delete user (cascade deletes related contexts) |
 | `ctx --delete-cluster` | Delete cluster (cascade deletes related contexts) |
 | `ctx --cleanup` | Delete orphan users/clusters |
+
+#### Fuzzy Search
+```bash
+ctx dev          # Exact match: dev-cluster
+ctx gke          # Fuzzy match: gke-cluster  
+ctx aws          # Fuzzy match: aws-eks-cluster
+ctx prod-ek      # Multiple matches → shows list
+```
 
 ### Namespace (`ns`)
 
