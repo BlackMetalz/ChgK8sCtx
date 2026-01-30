@@ -31,6 +31,8 @@ go run . <command>
 | `ctx --cleanup` | Delete orphan users/clusters |
 | `ctx merge <src1> <src2> -o <output>` | Merge two kubeconfig files |
 | `ctx validate` | Validate kubeconfig for broken references |
+| `ctx export <context-name>` | Export context to stdout |
+| `ctx import <file>` | Import context from file |
 
 #### Fuzzy Search
 ```bash
@@ -244,4 +246,34 @@ rm -f testdata/merged.yaml testdata/conflict-test.yaml
 # Test with valid config
 ./chg-test --kubeconfig testdata/kubeconfig.original ctx validate
 # Expected: No orphaned context/user/cluster found
+```
+
+### 12. Export/Import Context
+```bash
+# Export context to stdout
+./chg-test --kubeconfig testdata/kubeconfig.original ctx export gke-cluster
+
+# Export to file using pipe
+./chg-test --kubeconfig testdata/kubeconfig.original ctx export gke-cluster > testdata/gke-cluster.yaml
+
+# Before merge, only 2 context
+./chg-test --kubeconfig testdata/kubeconfig.merge1 ctx -l
+
+# Expected output:
+dev-cluster
+staging-cluster
+
+# Import into another kubeconfig
+./chg-test --kubeconfig testdata/kubeconfig.merge1 ctx import testdata/gke-cluster.yaml
+# Expected: "Imported context successfully to testdata/kubeconfig.merge1!"
+
+# After xD:
+./chg-test --kubeconfig testdata/kubeconfig.merge1 ctx -l
+# Expected:
+dev-cluster
+staging-cluster
+gke-cluster
+
+# Cleanup
+rm -f testdata/gke-cluster.yaml
 ```

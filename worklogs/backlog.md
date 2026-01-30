@@ -50,7 +50,7 @@ ctx validate  # Check for broken references
 # Output: "User 'old-admin' referenced by context but doesn't exist"
 ```
 
-### 7. Export/Import Context --> 
+### 7. Export/Import Context --> DONE
 Willing to implement.
 ```bash
 ctx export dev-cluster > dev.yaml

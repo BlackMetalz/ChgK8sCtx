@@ -122,7 +122,11 @@ func getKubeconfigPath() (string, error) {
 	// 3. Default kubeconfig
 
 	if kubeconfigFlag != "" {
-		fmt.Println("Using --kubeconfig flag: ", kubeconfigFlag)
+		if debugMode {
+			fmt.Println("Using --kubeconfig flag: ", kubeconfigFlag)
+		}
+		// Change to stderr. prevent issue in export command. Hmm in fact it doesn't
+		//fmt.Fprintf(os.Stderr, "Using --kubeconfig flag: %s\n", kubeconfigFlag)
 		return kubeconfigFlag, nil
 	}
 

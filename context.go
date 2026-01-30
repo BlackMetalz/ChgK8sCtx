@@ -562,3 +562,78 @@ func deleteOrphanData(config *KubeConfig, path string) error {
 	return nil
 
 }
+
+func exportContext(config *KubeConfig, contextName string) *KubeConfig {
+	// Find context
+	var targetCtx Context
+	for _, ctx := range config.Contexts {
+		if ctx.Name == contextName {
+			targetCtx = ctx
+			break
+		}
+	}
+
+	if targetCtx.Name == "" {
+		fmt.Println(red("Context not found!"))
+		return nil
+	}
+
+	// Find cluster
+	var targetCluster Cluster
+	for _, c := range config.Clusters {
+		if c.Name == targetCtx.Context.Cluster {
+			targetCluster = c
+			break
+		}
+	}
+
+	// Find user
+	var targetUser User
+	for _, u := range config.Users {
+		if u.Name == targetCtx.Context.User {
+			targetUser = u
+			break
+		}
+	}
+
+	// Create new kubeconfig only contain target context
+	exportCtx := &KubeConfig{
+		APIVersion:     "v1",
+		Kind:           "Config",
+		CurrentContext: contextName,
+		Contexts:       []Context{targetCtx},
+		Users:          []User{targetUser},
+		Clusters:       []Cluster{targetCluster},
+	}
+
+	return exportCtx
+}
+
+func importContext(importPath string) {
+	// Load current kubeconfig to import
+	currentPath, err := getKubeconfigPath()
+	if err != nil {
+		fmt.Println(red("Error getting current kubeconfig path:"), err)
+		return
+	}
+	currentConfig, err := loadConfig(currentPath)
+	if err != nil {
+		fmt.Println(red("Error loading current kubeconfig:"), err)
+		return
+	}
+
+	// Load import file
+	importConfig, err := loadConfig(importPath)
+	if err != nil {
+		fmt.Println(red("Error loading import kubeconfig:"), err)
+		return
+	}
+
+	// Merge - reuse existing merge func xD
+	mergeConfigs(importConfig, currentConfig)
+
+	// Save
+	saveConfig(currentPath, currentConfig)
+
+	fmt.Printf("Imported context successfully to %s!\n", green(currentPath))
+}
