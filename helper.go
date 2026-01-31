@@ -71,6 +71,7 @@ func cyan(s string) string {
 }
 */
 
+/*
 // Remove context by name in slice of Context struct
 // Logic is very simple, everyone include me could understand
 // just put name of context you want to remove in function, it will return a Context slice without that context
@@ -106,6 +107,8 @@ func removeClusterByName(clusters []Cluster, name string) []Cluster {
 	}
 	return result
 }
+
+*/
 
 // Check if items exists in kubeconfig
 // Works with context,cluster,user

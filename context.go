@@ -379,7 +379,11 @@ func deleteContext(config *KubeConfig, kubeconfigPath string, directArgs ...stri
 
 	// Remove from context slices
 	// Modify in memory only, persist in saveConfig() func
-	config.Contexts = removeContextByName(config.Contexts, targetContext)
+	// Use generic func to remove context by name
+	// config.Contexts = removeContextByName(config.Contexts, targetContext) // Before
+	config.Contexts = deleteEntryByName(config.Contexts, targetContext, func(ctx Context) string {
+		return ctx.Name
+	})
 
 	// If deleted current-context --> auto switch to another context
 	if targetContext == config.CurrentContext {
@@ -435,7 +439,10 @@ func deleteUser(config *KubeConfig, path string, directArgs ...string) error {
 
 		// Delete related context FIRST
 		for _, ctxName := range usedBy {
-			config.Contexts = removeContextByName(config.Contexts, ctxName)
+			// config.Contexts = removeContextByName(config.Contexts, ctxName)
+			config.Contexts = deleteEntryByName(config.Contexts, ctxName, func(c Context) string {
+				return c.Name
+			})
 			fmt.Printf("Deleted context: %s\n", red(ctxName))
 
 			// Auto switch if deleted current context
@@ -447,7 +454,12 @@ func deleteUser(config *KubeConfig, path string, directArgs ...string) error {
 	}
 
 	// Delete user
-	config.Users = removeUserByName(config.Users, targetUser)
+	// config.Users = removeUserByName(config.Users, targetUser)
+	// Refactor this shit.
+	config.Users = deleteEntryByName(config.Users, targetUser, func(u User) string {
+		return u.Name
+	})
+
 	if err := saveConfig(path, config); err != nil {
 		return err
 	}
@@ -494,7 +506,10 @@ func deleteCluster(config *KubeConfig, path string, directArgs ...string) error 
 
 		// Delete related context FIRST
 		for _, ctxName := range usedBy {
-			config.Contexts = removeContextByName(config.Contexts, ctxName)
+			// config.Contexts = removeContextByName(config.Contexts, ctxName)
+			config.Contexts = deleteEntryByName(config.Contexts, ctxName, func(c Context) string {
+				return c.Name
+			})
 			fmt.Printf("Deleted context: %s\n", red(ctxName))
 
 			// Auto switch if deleted current context
@@ -506,7 +521,12 @@ func deleteCluster(config *KubeConfig, path string, directArgs ...string) error 
 	}
 
 	// Delete cluster
-	config.Clusters = removeClusterByName(config.Clusters, targetCluster)
+	// config.Clusters = removeClusterByName(config.Clusters, targetCluster)
+	// Refactor this shiet
+	config.Clusters = deleteEntryByName(config.Clusters, targetCluster, func(c Cluster) string {
+		return c.Name
+	})
+
 	if err := saveConfig(path, config); err != nil {
 		return err
 	}
@@ -543,13 +563,19 @@ func deleteOrphanData(config *KubeConfig, path string) error {
 
 	// Delete all orphan users
 	for _, u := range orphanUsers {
-		config.Users = removeUserByName(config.Users, u)
+		// config.Users = removeUserByName(config.Users, u)
+		config.Users = deleteEntryByName(config.Users, u, func(u User) string {
+			return u.Name
+		})
 		fmt.Printf("Deleted user: %s\n", red(u))
 	}
 
 	// Delete all orphan clusters
 	for _, c := range orphanClusters {
-		config.Clusters = removeClusterByName(config.Clusters, c)
+		// config.Clusters = removeClusterByName(config.Clusters, c)
+		config.Clusters = deleteEntryByName(config.Clusters, c, func(c Cluster) string {
+			return c.Name
+		})
 		fmt.Printf("Deleted cluster: %s\n", red(c))
 	}
 
@@ -637,3 +663,42 @@ func importContext(importPath string) {
 
 	fmt.Printf("Imported context successfully to %s!\n", green(currentPath))
 }
+
+// New refactor func for delete Context/User/Cluster
+// This would use generics to handle delete entries
+// Doc: https://go.dev/doc/tutorial/generics
+func deleteEntryByName[Entry any](items []Entry, name string, getName func(Entry) string) []Entry {
+	var result []Entry
+	// Start loop through
+	// Same logic like removeByXXX. Check if name is not equal to name
+	// Then append to result, so the name matched would be removed
+	for _, item := range items {
+		if getName(item) != name {
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
+// This func is little hard for me. I don't care about writing comment in code. Haha
+/* Example usage
+config.Contexts = deleteEntryByName(
+    config.Contexts,         // 1. Slice of Context struct
+    targetContext,           // 2. Name (string) to remove
+    func(ctx Context) string { return ctx.Name }  // 3. "How to get name from this struct"
+)
+*/
+
+// Test
+/*
+func removeByName[T any](items []T, name string, getName func(T) string) []T {
+	var result []T
+	for _, item := range items {
+		if getName(item) != name {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+*/

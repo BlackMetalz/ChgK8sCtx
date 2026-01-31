@@ -57,10 +57,12 @@ ctx export dev-cluster > dev.yaml
 ctx import dev.yaml
 ```
 
-### 8. Unit Tests (Go learning!) --> 
+### 8. Unit Tests (Go learning!) --> Done
 Write tests for helper functions - learn testing package!
+Result: Not really, I asked Gemini to do it xD
 
-### 9. Refactoring Ideas -->
+
+### 9. Refactoring Ideas --> WIP
 1. Extract duplicate "context list building" → helper
 2. Use errors.New() instead of fmt.Errorf() for static errors
 3. Implement interfaces for testability

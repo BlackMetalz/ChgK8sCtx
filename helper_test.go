@@ -149,52 +149,68 @@ func TestGetOrphanClusters(t *testing.T) {
 }
 
 // ========================================
-// Test removeContextByName
+// Test deleteEntryByName (Generic function!)
 // ========================================
-func TestRemoveContextByName(t *testing.T) {
-	config := createTestConfig()
-	original := len(config.Contexts) // 3
+func TestDeleteEntryByName(t *testing.T) {
+	t.Run("delete context by name", func(t *testing.T) {
+		config := createTestConfig()
+		original := len(config.Contexts) // 3
 
-	result := removeContextByName(config.Contexts, "dev-cluster")
+		result := deleteEntryByName(config.Contexts, "dev-cluster", func(c Context) string {
+			return c.Name
+		})
 
-	if len(result) != original-1 {
-		t.Errorf("removeContextByName() len = %d; want %d", len(result), original-1)
-	}
-
-	// Check that dev-cluster is actually removed
-	for _, ctx := range result {
-		if ctx.Name == "dev-cluster" {
-			t.Errorf("removeContextByName() should have removed dev-cluster")
+		if len(result) != original-1 {
+			t.Errorf("deleteEntryByName() contexts len = %d; want %d", len(result), original-1)
 		}
-	}
-}
 
-// ========================================
-// Test removeUserByName
-// ========================================
-func TestRemoveUserByName(t *testing.T) {
-	config := createTestConfig()
-	original := len(config.Users) // 4
+		// Check that dev-cluster is actually removed
+		for _, ctx := range result {
+			if ctx.Name == "dev-cluster" {
+				t.Errorf("deleteEntryByName() should have removed dev-cluster")
+			}
+		}
+	})
 
-	result := removeUserByName(config.Users, "orphan-user")
+	t.Run("delete user by name", func(t *testing.T) {
+		config := createTestConfig()
+		original := len(config.Users) // 4
 
-	if len(result) != original-1 {
-		t.Errorf("removeUserByName() len = %d; want %d", len(result), original-1)
-	}
-}
+		result := deleteEntryByName(config.Users, "orphan-user", func(u User) string {
+			return u.Name
+		})
 
-// ========================================
-// Test removeClusterByName
-// ========================================
-func TestRemoveClusterByName(t *testing.T) {
-	config := createTestConfig()
-	original := len(config.Clusters) // 4
+		if len(result) != original-1 {
+			t.Errorf("deleteEntryByName() users len = %d; want %d", len(result), original-1)
+		}
+	})
 
-	result := removeClusterByName(config.Clusters, "orphan-cluster")
+	t.Run("delete cluster by name", func(t *testing.T) {
+		config := createTestConfig()
+		original := len(config.Clusters) // 4
 
-	if len(result) != original-1 {
-		t.Errorf("removeClusterByName() len = %d; want %d", len(result), original-1)
-	}
+		result := deleteEntryByName(config.Clusters, "orphan-cluster", func(c Cluster) string {
+			return c.Name
+		})
+
+		if len(result) != original-1 {
+			t.Errorf("deleteEntryByName() clusters len = %d; want %d", len(result), original-1)
+		}
+	})
+
+	t.Run("delete non-existent item", func(t *testing.T) {
+		config := createTestConfig()
+		original := len(config.Contexts)
+
+		result := deleteEntryByName(config.Contexts, "non-existent", func(c Context) string {
+			return c.Name
+		})
+
+		// Should return same length - nothing deleted
+		if len(result) != original {
+			t.Errorf("deleteEntryByName() should not delete non-existent item")
+		}
+	})
 }
 
 // ========================================
