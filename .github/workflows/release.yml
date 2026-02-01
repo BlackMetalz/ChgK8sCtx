@@ -6,6 +6,7 @@ on:
   push:
     tags:
       - 'v*'  # Trigger on tags like v1.0.0, v0.1.0, etc.
+      # - 'latest' # Trigger on latest tag. But not really nescessary
 
 jobs:
   release:
@@ -13,7 +14,6 @@ jobs:
     permissions:
       contents: write  # fix permission to create release
 
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -46,7 +46,6 @@ jobs:
       with:
         files: |
           chgctx-linux-amd64
-          chgctx-linux-arm64
           chgctx-darwin-amd64
           chgctx-darwin-arm64
           chgctx-windows-amd64.exe
