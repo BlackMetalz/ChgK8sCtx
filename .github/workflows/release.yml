@@ -18,35 +18,35 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.24.2'
+        go-version: '1.25.0'
 
     - name: Run tests
       run: go test -v ./...
 
     - name: Build Linux amd64
-      run: GOOS=linux GOARCH=amd64 go build -o chg-k8s-ctx-linux-amd64 .
+      run: GOOS=linux GOARCH=amd64 go build -o chgctx-linux-amd64 .
 
     - name: Build Linux arm64
-      run: GOOS=linux GOARCH=arm64 go build -o chg-k8s-ctx-linux-arm64 .
+      run: GOOS=linux GOARCH=arm64 go build -o chgctx-linux-arm64 .
 
     - name: Build macOS amd64
-      run: GOOS=darwin GOARCH=amd64 go build -o chg-k8s-ctx-darwin-amd64 .
+      run: GOOS=darwin GOARCH=amd64 go build -o chgctx-darwin-amd64 .
 
     - name: Build macOS arm64 (Apple Silicon)
-      run: GOOS=darwin GOARCH=arm64 go build -o chg-k8s-ctx-darwin-arm64 .
+      run: GOOS=darwin GOARCH=arm64 go build -o chgctx-darwin-arm64 .
 
     - name: Build Windows amd64
-      run: GOOS=windows GOARCH=amd64 go build -o chg-k8s-ctx-windows-amd64.exe .
+      run: GOOS=windows GOARCH=amd64 go build -o chgctx-windows-amd64.exe .
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          chg-k8s-ctx-linux-amd64
-          chg-k8s-ctx-linux-arm64
-          chg-k8s-ctx-darwin-amd64
-          chg-k8s-ctx-darwin-arm64
-          chg-k8s-ctx-windows-amd64.exe
+          chgctx-linux-amd64
+          chgctx-linux-arm64
+          chgctx-darwin-amd64
+          chgctx-darwin-arm64
+          chgctx-windows-amd64.exe
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
