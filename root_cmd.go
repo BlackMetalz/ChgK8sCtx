@@ -10,12 +10,14 @@ import (
 var (
 	debugMode      bool
 	kubeconfigFlag string
+	version        = "dev" // Injected at build time with -ldflags
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "chg-k8s-ctx",
-	Short: "A kubectx/kubens clone written in Go for learning purpose",
-	Long:  "ChgK8sCtx is a CLI tool to switch Kubernetes contexts and namespaces easily. My fucking pet project for learning Go",
+	Use:     "chgctx",
+	Version: version,
+	Short:   "A kubectx/kubens clone written in Go for learning purpose",
+	Long:    "ChgK8sCtx is a CLI tool to switch Kubernetes contexts and namespaces easily. My fucking pet project for learning Go",
 
 	// Run when no subcommand is specified
 	// args is slice of string, contains all arguments after command name
