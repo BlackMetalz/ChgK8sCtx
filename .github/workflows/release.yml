@@ -26,8 +26,8 @@ jobs:
     - name: Build Linux amd64
       run: GOOS=linux GOARCH=amd64 go build -o chgctx-linux-amd64 .
 
-    - name: Build Linux arm64
-      run: GOOS=linux GOARCH=arm64 go build -o chgctx-linux-arm64 .
+    # - name: Build Linux arm64
+    #   run: GOOS=linux GOARCH=arm64 go build -o chgctx-linux-arm64 .
 
     - name: Build macOS amd64
       run: GOOS=darwin GOARCH=amd64 go build -o chgctx-darwin-amd64 .
