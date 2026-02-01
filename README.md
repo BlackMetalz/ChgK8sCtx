@@ -24,17 +24,12 @@ go test -v ./...
 
 ### Ubuntu/Linux (amd64)
 ```bash
-curl -LO https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgctx-linux-amd64
-chmod +x chgctx-linux-amd64
-sudo mv chgctx-linux-amd64 /usr/local/bin/chgctx
+curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgctx-linux-amd64 -o /tmp/chgctx && chmod +x /tmp/chgctx && sudo mv /tmp/chgctx /usr/local/bin/chgctx
 ```
 
 ### macOS (Apple Silicon)
 ```bash
-curl -LO https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgctx-darwin-arm64
-chmod +x chgctx-darwin-arm64
-xattr -d com.apple.quarantine chgctx-darwin-arm64
-sudo mv chgctx-darwin-arm64 /usr/local/bin/chgctx
+curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgctx-darwin-arm64 -o /tmp/chgctx && chmod +x /tmp/chgctx && sudo mv /tmp/chgctx /usr/local/bin/chgctx
 ```
 
 
