@@ -10,6 +10,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # fix permission to create release
+
     
     steps:
     - name: Checkout code
