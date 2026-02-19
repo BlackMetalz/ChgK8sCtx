@@ -72,15 +72,13 @@ func switchContext(config *KubeConfig, kubeconfigPath string) error {
 	// Save previous context
 	err = savePreviousContext(oldContext)
 	if err != nil {
-		fmt.Println("Error saving previous context")
-		return err
+		return fmt.Errorf("switchContext - savingPreviousContext: %w", err)
 	}
 
 	// saveConfig
 	err = saveConfig(kubeconfigPath, config) // config is pointer already.
 	if err != nil {
-		fmt.Println("Error writing to file")
-		return err
+		return fmt.Errorf("switchContext - savingConfig: %w", err)
 	}
 
 	return nil

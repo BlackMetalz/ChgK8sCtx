@@ -27,77 +27,85 @@ var ctxCmd = &cobra.Command{
 
 	// Run when user type 'chg-k8s-ctx ctx'
 	Args: cobra.MaximumNArgs(2), // 0 or 2 arguments
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if debugMode {
 			fmt.Println("ctx args: ", args)
 		}
 
-		path, _ := getKubeconfigPath()
-		config, _ := loadConfig(path)
+		path, err := getKubeconfigPath()
+		if err != nil {
+			return err
+		}
+
+		config, err := loadConfig(path)
+		if err != nil {
+			return err
+		}
 
 		// --list flag
 		if listFlag {
 			// fmt.Println("List all contexts")
 			listContexts(config)
-			return
+			return nil
 		}
 
 		// --current/-c flag
 		if currentFlag {
 			showCurrentContext(config)
-			return
+			return nil
 		}
 
 		// rename mode
 		if renameFlag {
+			// direct mode. Look stupid but simple xD
 			if len(args) == 2 {
-				renameContext(config, path, args[0], args[1]) // direct mode. Look stupid but simple xD
+				if err := renameContext(config, path, args[0], args[1]); err != nil {
+					return err
+				}
+				// interactive mode
 			} else if len(args) == 0 {
-				renameContext(config, path) // interactive mode
+				if err := renameContext(config, path); err != nil {
+					return err
+				}
 			} else {
-				fmt.Println("Unsupported arguments, only 2 arguments are supported")
+				return fmt.Errorf("Unsupported arguments, only 2 arguments are supported")
 			}
 
-			return // without return, it will run switchContext below
+			return nil // without return, it will run switchContext below
 			// if dont need to return if we put renameFlag condition into if-else below
 			// But it is not clear i guess.
 		}
 
 		// --delete/x flag
 		if deleteFlag {
-			deleteContext(config, path, args...) // Take variadic args
-			return
+			return deleteContext(config, path, args...)
 		}
 
 		// For deleteUserFlag and deleteClusterFlag
 		if deleteUserFlag {
-			deleteUser(config, path, args...)
-			return
+			return deleteUser(config, path, args...)
 		}
 
 		if deleteClusterFlag {
 			// deleteCluster(config, path, args...)
 			// LOL, we literal copy deleteUser function xD. But could use same function aswell without small change!
 			// Holy fucking shit, opportunity for refactoring again!
-			deleteCluster(config, path, args...)
-			return
+			return deleteCluster(config, path, args...)
 		}
 
 		// --cleanup flag
 		if cleanupFlag {
-			deleteOrphanData(config, path)
-			return
+			return deleteOrphanData(config, path)
 		}
 
 		if len(args) == 0 {
 			// Interactive mode
-			switchContext(config, path)
+			return switchContext(config, path)
 		} else if len(args) == 1 && args[0] == "-" {
 			// Load previous context
 			prevCtx, err := loadPreviousContext()
 			if err != nil {
-				fmt.Println("Error loading previous context")
-				return
+				return err
 			}
 			// Switch to previous context
 			prevCtx = strings.TrimSpace(prevCtx) // Remove trailing \n
@@ -111,8 +119,7 @@ var ctxCmd = &cobra.Command{
 			// Save config
 			err = saveConfig(path, config)
 			if err != nil {
-				fmt.Printf("Error writing to file: %v\n", err)
-				return
+				return err
 			}
 
 			fmt.Printf("Switched to context %s\n", green(prevCtx))
@@ -123,8 +130,7 @@ var ctxCmd = &cobra.Command{
 
 			// Check if current context first.
 			if targetCtx == config.CurrentContext {
-				fmt.Printf("You are already on context %s\n", yellow(targetCtx))
-				return
+				return fmt.Errorf("You are already on context %s", yellow(targetCtx))
 			}
 
 			// Replace item exists with additional fuzzy search
@@ -145,8 +151,7 @@ var ctxCmd = &cobra.Command{
 				// Save config
 				err := saveConfig(path, config)
 				if err != nil {
-					fmt.Printf("Error writing to file: %v\n", err)
-					return
+					return err
 				}
 
 				fmt.Printf("Switched to context %s\n", green(targetCtx))
@@ -158,8 +163,7 @@ var ctxCmd = &cobra.Command{
 				// Count matches from fuzzy search to handle different cases
 				switch len(matches) {
 				case 0:
-					fmt.Printf("Context %s does not exist\n", red(targetCtx))
-					return
+					return fmt.Errorf("Context %s does not exist", red(targetCtx))
 				case 1:
 					targetCtx = matches[0] // use single match to match context
 					// Because we only able to choose one context, we can just use the first match
@@ -171,15 +175,13 @@ var ctxCmd = &cobra.Command{
 					config.CurrentContext = targetCtx
 					fmt.Printf("Fuzzy matched: %s\n", green(targetCtx))
 				default:
-					fmt.Printf("Multiple matches for '%s' : %v\n", targetCtx, matches)
-					return
+					return fmt.Errorf("Multiple matches for '%s' : %v", targetCtx, matches)
 				}
 
 				// Save config
 				err := saveConfig(path, config)
 				if err != nil {
-					fmt.Printf("Error writing to file: %v\n", err)
-					return
+					return err
 				}
 
 				fmt.Printf("Switched to context %s\n", green(targetCtx))
@@ -187,8 +189,10 @@ var ctxCmd = &cobra.Command{
 
 		} else {
 			// exception xD
-			fmt.Println(red("Too many arguments"))
+			return fmt.Errorf("Too many arguments")
 		}
+
+		return nil
 
 	},
 }
