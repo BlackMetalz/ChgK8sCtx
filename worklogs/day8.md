@@ -74,7 +74,7 @@ func removeUserByName(users []User, name string) []User
 func removeClusterByName(clusters []Cluster, name string) []Cluster
 
 // Generic (1 function):
-func removeByName[T any](<items []T, name string, getName func(T>) string) []T
+func removeByName[T any](items []T, name string, getName func(T) string) []T
 //                              ↑                                          ↑
 //                        []Context/[]User/[]Cluster                 return same type
 ```
