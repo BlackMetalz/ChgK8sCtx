@@ -29,6 +29,14 @@ Examples:
 		path, _ := getKubeconfigPath()
 		config, _ := loadConfig(path)
 
+		// Option C: warn when a context name conflicts with this subcommand name.
+		// e.g. if user has a context named "ns", `chgctx ns` routes here instead.
+		// Suggest using `chgctx ctx ns` as explicit escape hatch.
+		if config != nil && itemExists(config, "context", cmd.Name()) {
+			fmt.Printf(yellow("⚠ Hint:")+" context '%s' exists. To switch context, use: chgctx ctx %s\n\n",
+				cmd.Name(), cmd.Name())
+		}
+
 		if len(args) == 0 {
 			// Interactive mode
 			switchNamespace(config, path)
