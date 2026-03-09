@@ -9,6 +9,9 @@ Flat structure:
 - make it works with idea of Kubectx and Kubens
 
 # Usage
+NOTE: You can see some print duplicate in previous ( showing triple line). It is fixed in v0.0.4 xD
+
+
 - Change context with selection
 
 ![change context](./images/gif/change_context.gif)
