@@ -17,6 +17,10 @@ Flat structure:
 
 ![change context fuzzy](./images/gif/change_context_fuzzy.gif)
 
+- Change context to previous context
+
+![change context previous](./images/gif/change_context_previous.gif)
+
 # Build
 Tested with `go version go1.25.0 darwin/arm64`
 ```bash
@@ -39,11 +43,5 @@ curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgct
 ### macOS (Apple Silicon)
 ```bash
 curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgctx-darwin-arm64 -o /tmp/chgctx && chmod +x /tmp/chgctx && sudo mv /tmp/chgctx /usr/local/bin/chgctx
-```
-
-
-# Tunnel from jump
-```bash
-ssh -N -f -L 8443:kienlt-lab-machine-1:6443 kienlt-lab-jump
 ```
 
