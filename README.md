@@ -5,8 +5,17 @@ Flat structure:
 - My project is fucking small
 - No need to make it complex or fancy LOL
 
-# Feature/TODO
+# Feature
 - make it works with idea of Kubectx and Kubens
+
+# Usage
+- Change context with selection
+
+![change context](./images/gif/change_context.gif)
+
+- Change context with fuzzy selection xD
+
+![change context fuzzy](./images/gif/change_context_fuzzy.gif)
 
 # Build
 Tested with `go version go1.25.0 darwin/arm64`
