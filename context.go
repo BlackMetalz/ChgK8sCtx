@@ -70,7 +70,7 @@ func switchContext(config *KubeConfig, kubeconfigPath string) error {
 	config.CurrentContext = result
 
 	// Save previous context
-	err = savePreviousContext(oldContext)
+	err = savePreviousContext(kubeconfigPath, oldContext)
 	if err != nil {
 		return fmt.Errorf("switchContext - savingPreviousContext: %w", err)
 	}

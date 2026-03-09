@@ -215,12 +215,9 @@ func fuzzyFindContext(config *KubeConfig, query string) []string {
 }
 
 // For history switch back
-func savePreviousContext(ctx string) error {
+func savePreviousContext(kubeconfigPath string, ctx string) error {
 	// Write to history file
-	filePath, err := getHistoryFilePath()
-	if err != nil {
-		return err
-	}
+	filePath := getHistoryFilePath(kubeconfigPath)
 
 	// Open file with truncate mode to overwrite
 	file, err := os.OpenFile(filePath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
@@ -239,12 +236,9 @@ func savePreviousContext(ctx string) error {
 	return nil
 }
 
-func loadPreviousContext() (string, error) {
+func loadPreviousContext(kubeconfigPath string) (string, error) {
 	// read from history file
-	filePath, err := getHistoryFilePath()
-	if err != nil {
-		return "", err
-	}
+	filePath := getHistoryFilePath(kubeconfigPath)
 
 	// Open file in read mode
 	file, err := os.Open(filePath)

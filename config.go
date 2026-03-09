@@ -155,13 +155,8 @@ func getKubeconfigPath() (string, error) {
 }
 
 // Get history file Path - For multiple OS support
-func getHistoryFilePath() (string, error) {
-	kubeconfigPath, err := getKubeconfigPath() // DRY
-	if err != nil {
-		return "", err
-	}
-
+func getHistoryFilePath(kubeconfigPath string) string {
 	// History file same folder with kubeconfig
 	dir := filepath.Dir(kubeconfigPath)
-	return filepath.Join(dir, historyFileName), nil
+	return filepath.Join(dir, historyFileName)
 }

@@ -104,7 +104,7 @@ var ctxCmd = &cobra.Command{
 			return switchContext(config, path)
 		} else if len(args) == 1 && args[0] == "-" {
 			// Load previous context
-			prevCtx, err := loadPreviousContext()
+			prevCtx, err := loadPreviousContext(path)
 			if err != nil {
 				return err
 			}
@@ -112,7 +112,7 @@ var ctxCmd = &cobra.Command{
 			prevCtx = strings.TrimSpace(prevCtx) // Remove trailing \n
 			// Don't forget to save previous context
 			oldCtx := config.CurrentContext
-			savePreviousContext(oldCtx)
+			savePreviousContext(path, oldCtx)
 
 			// Update struct for current context
 			config.CurrentContext = prevCtx
@@ -145,7 +145,7 @@ var ctxCmd = &cobra.Command{
 
 				// Save previous context BEFORE switch
 				// Without this shit, we can't switch back to previous context
-				savePreviousContext(config.CurrentContext)
+				savePreviousContext(path, config.CurrentContext)
 
 				// Update struct
 				config.CurrentContext = targetCtx
@@ -170,7 +170,7 @@ var ctxCmd = &cobra.Command{
 					// Because we only able to choose one context, we can just use the first match
 
 					// Save previous context BEFORE switch
-					savePreviousContext(config.CurrentContext)
+					savePreviousContext(path, config.CurrentContext)
 
 					// Update struct
 					config.CurrentContext = targetCtx
