@@ -2,12 +2,12 @@ package main
 
 // Import this shit for unmarshal yaml
 // Import cmd package locally, not start with github.com
-// "chgk8sctx/cmd" // no need to import
+// "kctx/cmd" // no need to import
 
 func main() {
 
 	// Example:
-	// args[0] = binary name (ex: "./ChgK8sCtx")
+	// args[0] = binary name (ex: "./kctx")
 	// args[1] = first arg (ex: "ctx" or "ns")
 
 	// Get namespace list

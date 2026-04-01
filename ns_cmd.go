@@ -12,14 +12,14 @@ var nsCmd = &cobra.Command{
 	Long: `Switch to a different kubernetes namespace. 
 Examples:
   # Interactive mode - show selection menu
-  chg-k8s-ctx ns
+  kctx ns
   
   # Direct mode - switch immediately  
-  chg-k8s-ctx ns kube-public
-  chg-k8s-ctx ns my-namespace`,
+  kctx ns kube-public
+  kctx ns my-namespace`,
 	// Add Example field (optional)
-	Example: `  chg-k8s-ctx ns
-  chg-k8s-ctx ns kube-public`,
+	Example: `  kctx ns
+  kctx ns kube-public`,
 	Args: cobra.MaximumNArgs(1), // Set max args to 1
 	Run: func(cmd *cobra.Command, args []string) {
 		if debugMode {
@@ -30,10 +30,10 @@ Examples:
 		config, _ := loadConfig(path)
 
 		// Option C: warn when a context name conflicts with this subcommand name.
-		// e.g. if user has a context named "ns", `chgctx ns` routes here instead.
-		// Suggest using `chgctx ctx ns` as explicit escape hatch.
+		// e.g. if user has a context named "ns", `kctx ns` routes here instead.
+		// Suggest using `kctx ctx ns` as explicit escape hatch.
 		if config != nil && itemExists(config, "context", cmd.Name()) {
-			fmt.Printf(yellow("⚠ Hint:")+" context '%s' exists. To switch context, use: chgctx ctx %s\n\n",
+			fmt.Printf(yellow("⚠ Hint:")+" context '%s' exists. To switch context, use: kctx ctx %s\n\n",
 				cmd.Name(), cmd.Name())
 		}
 

@@ -14,10 +14,10 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "chgctx",
+	Use:     "kctx",
 	Version: version,
 	Short:   "A kubectx/kubens clone written in Go for learning purpose",
-	Long:    "ChgK8sCtx is a CLI tool to switch Kubernetes contexts and namespaces easily. My fucking pet project for learning Go",
+	Long:    "kctx is a CLI tool to switch Kubernetes contexts and namespaces easily. My fucking pet project for learning Go",
 
 	// Allow any args so Cobra doesn't reject context names like "aws", "gke", etc.
 	// Without this, Cobra treats unknown first-args as unknown subcommands and errors.
@@ -36,8 +36,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&debugMode, "debug", "d", false, "Enable debug mode, show debug information xD")
 	rootCmd.PersistentFlags().StringVar(&kubeconfigFlag, "kubeconfig", "", "Path to kubeconfig file specified")
 
-	// Mirror all ctx flags on root so `chgctx --list`, `chgctx -c`, etc. work directly.
-	// Same variables as ctxCmd so both `chgctx --list` and `chgctx ctx --list` work.
+	// Mirror all ctx flags on root so `kctx --list`, `kctx -c`, etc. work directly.
+	// Same variables as ctxCmd so both `kctx --list` and `kctx ctx --list` work.
 	rootCmd.Flags().BoolVar(&renameFlag, "rename", false, "Rename context")
 	rootCmd.Flags().BoolVarP(&listFlag, "list", "l", false, "List all contexts")
 	rootCmd.Flags().BoolVarP(&currentFlag, "current", "c", false, "Show current context")

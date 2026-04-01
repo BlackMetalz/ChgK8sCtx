@@ -26,7 +26,7 @@ var ctxCmd = &cobra.Command{
 	Long:          `Switch to a different kubernetes context. If no context name provided, show interactive selection.`,
 	SilenceUsage:  true, // Don't show usage when error
 	SilenceErrors: true, // Don't show error
-	// Run when user type 'chg-k8s-ctx ctx'
+	// Run when user type 'kctx ctx'
 	Args: cobra.MaximumNArgs(2), // 0 or 2 arguments
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if debugMode {

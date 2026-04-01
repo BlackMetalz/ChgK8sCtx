@@ -9,7 +9,7 @@ import (
 )
 
 // For context switch back (ctx -)
-const historyFileName = "chg-k8s-ctx-history"
+const historyFileName = "kctx-history"
 
 // Parse kubeconfig file to struct
 func loadConfig(path string) (*KubeConfig, error) {

@@ -1,4 +1,4 @@
-module chgk8sctx
+module kctx
 
 go 1.25.0
 
