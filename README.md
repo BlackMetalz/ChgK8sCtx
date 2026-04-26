@@ -28,7 +28,7 @@ NOTE: You can see some print duplicate in previous ( showing triple line). It is
 Tested with `go version go1.25.0 darwin/arm64`
 ```bash
 go mod tidy
-go build -o chgctx .
+go build -o kctx .
 ```
 
 # Run Unit Test
@@ -40,11 +40,11 @@ go test -v ./...
 
 ### Ubuntu/Linux (amd64)
 ```bash
-curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgctx-linux-amd64 -o /tmp/chgctx && chmod +x /tmp/chgctx && sudo mv /tmp/chgctx /usr/local/bin/chgctx && chgctx -v
+curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/kctx-linux-amd64 -o /tmp/kctx && chmod +x /tmp/kctx && sudo mv /tmp/kctx /usr/local/bin/kctx && kctx -v
 ```
 
 ### macOS (Apple Silicon)
 ```bash
-curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/chgctx-darwin-arm64 -o /tmp/chgctx && chmod +x /tmp/chgctx && sudo mv /tmp/chgctx /usr/local/bin/chgctx && chgctx -v
+curl -sL https://github.com/BlackMetalz/ChgK8sCtx/releases/latest/download/kctx-darwin-arm64 -o /tmp/kctx && chmod +x /tmp/kctx && sudo mv /tmp/kctx /usr/local/bin/kctx && kctx -v
 ```
 
