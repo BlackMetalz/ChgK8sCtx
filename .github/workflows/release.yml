@@ -27,28 +27,24 @@ jobs:
       run: go test -v ./...
 
     - name: Build Linux amd64
-      run: GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o chgctx-linux-amd64 .
+      run: GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o kctx-linux-amd64 .
 
     # - name: Build Linux arm64
-    #   run: GOOS=linux GOARCH=arm64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o chgctx-linux-arm64 .
+    #   run: GOOS=linux GOARCH=arm64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o kctx-linux-arm64 .
 
     - name: Build macOS amd64
-      run: GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o chgctx-darwin-amd64 .
+      run: GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o kctx-darwin-amd64 .
 
     - name: Build macOS arm64 (Apple Silicon)
-      run: GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o chgctx-darwin-arm64 .
-
-    - name: Build Windows amd64
-      run: GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o chgctx-windows-amd64.exe .
+      run: GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o kctx-darwin-arm64 .
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          chgctx-linux-amd64
-          chgctx-darwin-amd64
-          chgctx-darwin-arm64
-          chgctx-windows-amd64.exe
+          kctx-linux-amd64
+          kctx-darwin-amd64
+          kctx-darwin-arm64
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
